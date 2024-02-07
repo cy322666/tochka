@@ -10,8 +10,10 @@ COPY files/php/php.ini /usr/local/etc/php/conf.d/php.ini
 #COPY files/php/ext /phpIni
 
 # SYS: Install required packages
-RUN apk --no-cache upgrade && \
-    apk --no-cache add bash git sudo openssh libxml2-dev postgresql-dev oniguruma-dev autoconf g++ make npm freetype-dev libjpeg-turbo-dev libpng-dev libzip-dev
+#oniguruma-dev
+#make
+RUN apk upgrade && \
+    apk add bash libxml2-dev postgresql-dev autoconf g++ npm freetype-dev libjpeg-turbo-dev libpng-dev libzip-dev
 
 RUN apk add --no-cache postgresql-client libpq-dev
 
@@ -32,7 +34,6 @@ RUN docker-php-ext-install mbstring xml pcntl zip pdo pdo_pgsql bcmath soap
 RUN docker-php-ext-enable mbstring xml zip swoole pcov pcntl bcmath pdo pdo_pgsql soap
 
 RUN docker-php-ext-install exif
-
 RUN docker-php-ext-install -j "$(nproc)" gd
 
 RUN docker-php-ext-install intl opcache \
@@ -51,7 +52,9 @@ RUN apk add --no-cache nodejs npm && \
     npm config set prefix "/home/www-data/.npm-global/" && \
     npm install -g chokidar
 
-RUN docker-php-ext-install gd mysqli pdo pdo_mysql -j5 gd mbstring mysqli pdo pdo_mysql shmop
+#mysqli
+#pdo_mysql
+RUN #docker-php-ext-install gd mysqli pdo -j5 gd mbstring  pdo pdo_mysql shmop
 
 RUN apk --update add redis
 
