@@ -12,8 +12,10 @@ COPY files/php/php.ini /usr/local/etc/php/conf.d/php.ini
 # SYS: Install required packages
 #oniguruma-dev
 #make
-RUN apk upgrade && \
-    apk add bash libxml2-dev postgresql-dev autoconf g++ npm freetype-dev libjpeg-turbo-dev libpng-dev libzip-dev
+RUN apk add bash libxml2-dev  \
+RUN apk add bashpostgresql-dev autoconf  \
+RUN apk add bash g++ npm freetype-dev  \
+RUN apk add bash libjpeg-turbo-dev libpng-dev libzip-dev
 
 RUN apk add --no-cache postgresql-client libpq-dev
 
