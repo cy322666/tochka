@@ -12,8 +12,8 @@ COPY files/php/php.ini /usr/local/etc/php/conf.d/php.ini
 # SYS: Install required packages
 #oniguruma-dev
 #make
-RUN apk add --no-cache bashpostgresql-dev autoconf
 RUN apk add --no-cache bash g++ npm freetype-dev
+RUN apk add --no-cache bashpostgresql-dev autoconf
 RUN apk add --no-cache bash libjpeg-turbo-dev libpng-dev libzip-dev
 RUN apk add --no-cache bash libxml2-dev
 
