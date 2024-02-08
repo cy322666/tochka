@@ -24,6 +24,8 @@ RUN apk add --no-cache postgresql-client libpq-dev
 # COMPOSER: install binary and prestissimo
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
 
+RUN apt-get update
+
 # PHP: Install php extensions
 RUN pecl channel-update pecl.php.net
 RUN pecl install pcov
