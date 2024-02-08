@@ -10,9 +10,6 @@ COPY files/php/php.ini /usr/local/etc/php/conf.d/php.ini
 #COPY files/php/ext /phpIni
 
 # SYS: Install required packages
-#oniguruma-dev
-#make
-#bash
 RUN apk add --no-cache g++ npm freetype-dev
 RUN apk add --no-cache bash postgresql-dev autoconf
 RUN apk add --no-cache libjpeg-turbo-dev libpng-dev libzip-dev
@@ -24,7 +21,7 @@ RUN apk add --no-cache postgresql-client libpq-dev
 # COMPOSER: install binary and prestissimo
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
 
-RUN apt-get update
+RUN apk add --no-cache oniguruma-dev make
 
 # PHP: Install php extensions
 RUN pecl channel-update pecl.php.net
