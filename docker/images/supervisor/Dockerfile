@@ -22,6 +22,6 @@ RUN apt install php8.1-pgsql -y \
 COPY files/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 #COPY files/worker.conf /etc/supervisor/conf.d/worker.conf
 
-EXPOSE 8.18
+#EXPOSE 8.18
 
 CMD ["/usr/bin/supervisord"]
