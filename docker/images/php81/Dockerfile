@@ -14,7 +14,7 @@ COPY files/php/php.ini /usr/local/etc/php/conf.d/php.ini
 #make
 #bash
 RUN apk add --no-cache g++ npm freetype-dev
-RUN apk add --no-cache bashpostgresql-dev autoconf
+RUN apk add --no-cache bash postgresql-dev autoconf
 RUN apk add --no-cache libjpeg-turbo-dev libpng-dev libzip-dev
 RUN apk add --no-cache libxml2-dev
 
