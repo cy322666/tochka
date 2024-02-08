@@ -25,8 +25,8 @@ RUN apk add --no-cache postgresql-client libpq-dev
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
 
 # PHP: Install php extensions
-RUN pecl channel-update pecl.php.net
-RUN pecl install pcov
+RUN #pecl channel-update pecl.php.net
+RUN #pecl install pcov
 RUN pecl install swoole
 
 #RUN docker-php-ext-configure gd --with-freetype --with-jpeg
