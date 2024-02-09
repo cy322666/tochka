@@ -11,7 +11,7 @@ services:
         links:
             - postgresql
             - redis
-            - supervisor
+#            - supervisor
         working_dir: /var/www/html
     postgresql:
         image: postgres:14.1-alpine
@@ -32,14 +32,14 @@ services:
         environment:
             - ALLOW_EMPTY_PASSWORD=yes
         restart: always
-    supervisor:
-        build: ./docker/images/supervisor
-        working_dir: /var/www/html
-        restart: unless-stopped
-        volumes:
-            - ./application:/var/www/html
-            - ./docker/images/supervisor/files:/etc/supervisor/conf.d/
-        ports:
-            - "8007:8008"
+#    supervisor:
+#        build: ./docker/images/supervisor
+#        working_dir: /var/www/html
+#        restart: unless-stopped
+#        volumes:
+#            - ./application:/var/www/html
+#            - ./docker/images/supervisor/files:/etc/supervisor/conf.d/
+#        ports:
+#            - "8007:8008"
 
 

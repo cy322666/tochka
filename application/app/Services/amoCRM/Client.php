@@ -2,7 +2,7 @@
 
 namespace App\Services\amoCRM;
 
-use App\Models\Core\Account;
+use App\Models\Account;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Config;
@@ -25,7 +25,7 @@ class Client
      */
     public function __construct(Account $account)
     {
-        $this->user = $account->user;
+//        $this->user = $account->user;
 
         $this->storage = new EloquentStorage([
             'domain'    => $account->subdomain ?? null,
@@ -86,8 +86,6 @@ class Client
         if ($this->storage->model->refresh_token) {
 
             $oauth = $this->service->refreshAccessToken($this->storage->model->refresh_token);
-
-            Log::channel('tokens')->info('refresh user : '.$this->user->email, $oauth);
 
         } else
             $oauth = $this->service->fetchAccessToken($this->storage->model->code);

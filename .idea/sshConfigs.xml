@@ -5,6 +5,9 @@
       <sshConfig authType="PASSWORD" host="89.104.70.197" id="5c5b0ad8-4a7d-4b69-b321-48ef7cddb639" port="22" customName="tochka" nameFormat="CUSTOM" username="root" useOpenSSHConfig="true">
         <option name="customName" value="tochka" />
       </sshConfig>
+      <sshConfig authType="PASSWORD" host="5.35.93.141" id="bd469e26-0a9f-497f-b908-1813aabe6139" port="22" customName="tochka beget" nameFormat="CUSTOM" username="root" useOpenSSHConfig="true">
+        <option name="customName" value="tochka beget" />
+      </sshConfig>
     </configs>
   </component>
 </project>

@@ -20,19 +20,13 @@ class GetHook extends Command
     /**
      * @throws \Exception
      */
-    public function __construct()
-    {
-        $this->amoApi = (new Client(Account::query()->first()))->init();
-
-        $this->statuses  = [];
-        $this->pipelines = [];
-    }
-
-    /**
-     * @throws \Exception
-     */
     public function handle()
     {
+        $this->statuses  = [];
+        $this->pipelines = [];
+
+        $this->amoApi = (new Client(Account::query()->first()))->init();
+
         $hook = $this->argument('hook');
 
         $contact = $this->amoApi->service->contacts()->find($hook->contact_id);

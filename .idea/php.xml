@@ -114,6 +114,10 @@
       <path value="$PROJECT_DIR$/application/vendor/laravel/serializable-closure" />
       <path value="$PROJECT_DIR$/application/vendor/laravel/pint" />
       <path value="$PROJECT_DIR$/application/vendor/laravel/tinker" />
+      <path value="$PROJECT_DIR$/application/vendor/laravel/octane" />
+      <path value="$PROJECT_DIR$/application/vendor/symfony/psr-http-message-bridge" />
+      <path value="$PROJECT_DIR$/application/vendor/laminas/laminas-diactoros" />
+      <path value="$PROJECT_DIR$/application/vendor/ufee/amoapi" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.1">
