@@ -43,7 +43,7 @@ class Person
 
     public function list(): array
     {
-        for ($offset = 0, $limit = 1, $persons = [] ; ; $offset += $limit) {
+        for ($offset = 0, $limit = 100, $persons = [] ; $offset < 200 ; $offset += $limit) {
 
             $response = Http::withHeaders($this->service->getHeaders())
                 ->get($this->service::$baseUrl.'/v1/person', [

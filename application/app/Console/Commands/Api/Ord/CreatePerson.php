@@ -3,6 +3,7 @@
 namespace App\Console\Commands\Api\Ord;
 
 use App\Models\Account;
+use App\Models\Api\Ord\Person;
 use App\Services\amoCRM\Client;
 use App\Services\Ord\OrdService;
 use Illuminate\Console\Command;
@@ -32,7 +33,12 @@ class CreatePerson extends Command
     {
         $transaction = $this->argument('transaction');
 
-        $amoApi = (new Client(Account::query()->first()))->init();
+        $amoApi = (new Client(
+            Account::query()
+                ->where('subdomain', 'tochkaznanij')
+                ->first()
+        ))->init();
+
         $ordApi = new OrdService();
 
         $lead   = $amoApi->service->leads()->find($transaction->lead_id);
@@ -40,25 +46,32 @@ class CreatePerson extends Command
 
         $company = $lead->company;
 
-        $person->uuid  = Uuid::uuid4();
-        $person->name  = $company->name;
-        $person->type  = 'physical';
-        $person->inn   = $company->cf('ИНН')->getValue();
-        $person->phone = $company->cf('Телефон')->getValue();
-        $person->create();
+        $searchPerson = Person::query()
+            ->where('inn', $company->cf('ИНН')->getValue())
+            ->first();
 
-        $transaction->uuid_person = $person->uuid;
-        $transaction->name = $person->name;
-        $transaction->type = $person->type;
-        $transaction->inn = $person->inn;
-        $transaction->phone = $person->phone;
-        $transaction->save();
+        if (!$searchPerson) {
 
-        $personCreated = $ordApi->person()->get($person->uuid);
+            $person->uuid  = Uuid::uuid4();
+            $person->name  = $company->name;
+            $person->type  = Person::matchType($company->cf('Тип')->getValue());
+            $person->inn   = $company->cf('ИНН')->getValue();
+            $person->phone = $company->cf('Телефон')->getValue();
+            $person->create();
+
+            $transaction->uuid_person = $person->uuid;
+            $transaction->phone = $person->phone;
+            $transaction->name = $person->name;
+            $transaction->type = $person->type;
+            $transaction->inn  = $person->inn;
+            $transaction->save();
+        } else
+            $transaction->person_uuid = $searchPerson->uuid;
+
+        $ordApi->person()->get($searchPerson ? $searchPerson->uuid : $person->uuid);
 
         $transaction->company_id = $company->id;
         $transaction->contact_id = $lead->contact->id;
-        $transaction->status = is_array($personCreated);
         $transaction->save();
 
 //        $person->rs_url;

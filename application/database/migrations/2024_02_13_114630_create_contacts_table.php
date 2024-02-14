@@ -11,9 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ord_invoices', function (Blueprint $table) {
+        Schema::create('excel_filter_contacts', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+
+            $table->integer('contact_id')->nullable();
+            $table->integer('lead_id')->nullable();
+            $table->boolean('is_success')->nullable();
+            $table->integer('lead_id_success')->nullable();
+            $table->string('phone')->nullable();
         });
     }
 
@@ -22,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ord_invoices');
+        Schema::dropIfExists('excel_filter_contacts');
     }
 };

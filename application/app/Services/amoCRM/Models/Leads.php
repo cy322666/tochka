@@ -12,6 +12,22 @@ use Ufee\Amo\Models\Lead;
 
 abstract class Leads
 {
+    public static function searchInStatus($contact, $client, array $pipelines = [], int $status_id)
+    {
+        $leads = [];
+
+        if($contact->leads) {
+
+            foreach ($contact->leads->toArray() as $lead) {
+
+                if ($lead['status_id'] == $status_id && in_array($lead['pipeline_id'], $pipelines)) {
+
+                    return $lead['id'];
+                }
+            }
+        }
+    }
+
     public static function searchByStatus($contact, $client, int $pipeline_id, int $status_id) : ?array
     {
         $leads = [];

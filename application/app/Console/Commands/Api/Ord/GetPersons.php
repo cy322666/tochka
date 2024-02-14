@@ -31,7 +31,18 @@ class GetPersons extends Command
 
         foreach ($persons as $person) {
 
-            Person::query()->updateOrCreate(['uuid' => $person]);
+            $detail = (new OrdService())->person()->get($person);
+
+            Person::query()->updateOrCreate(['uuid' => $person], [
+                'create_date' => $detail->create_date,
+                'name'   => $detail->name ?? null,
+                'roles'  => json_encode($detail->roles) ?? null,
+                'juridical_details' => json_encode($detail->juridical_details) ?? null,
+                'type'   => $detail->juridical_details->type ?? null,
+                'phone'  => $detail->juridical_details->phone ?? null,
+                'inn'    => $detail->juridical_details->inn ?? null,
+                'rs_url' => $detail->juridical_details->rs_url ?? null,
+            ]);
         }
     }
 }

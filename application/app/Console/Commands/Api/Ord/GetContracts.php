@@ -31,7 +31,17 @@ class GetContracts extends Command
 
         foreach ($contracts as $contract) {
 
-            Contract::query()->updateOrCreate(['uuid' => $contract]);
+            $detail = (new OrdService())->contract()->get($contract);
+
+            Contract::query()->updateOrCreate(['uuid' => $contract], [
+                'client_external_id'     => $detail->client_external_id,
+                'contractor_external_id' => $detail->contractor_external_id,
+                'create_date'  => $detail->create_date,
+                'subject_type' => $detail->subject_type,
+                'type'   => $detail->type,
+                'date'   => $detail->date,
+                'serial' => $detail->serial,
+            ]);
         }
     }
 }

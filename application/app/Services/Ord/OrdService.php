@@ -32,6 +32,11 @@ class OrdService
         return new Creative($this);
     }
 
+    public function invoice(): Invoce
+    {
+        return new Invoce($this);
+    }
+
     public function parseResponse(Response $response)
     {
         return json_decode($response->body());

@@ -35,15 +35,15 @@ class CreateCreative extends Command
         $amoApi = (new Client(Account::query()->first()))->init();
         $ordApi = new OrdService();
 
-        $lead     = $amoApi->service->leads()->find(44622459);
+        $lead     = $amoApi->service->leads()->find($transaction->lead_id);
         $creative = $ordApi->creative();
 
         $creative->uuid  = Uuid::uuid4();
-        $creative->contract_external_id = '11724b84-2ac2-4f09-9494-f0316a5313de';
-        $creative->name = 'hz';
+        $creative->contract_external_id = $transaction->contract_uuid;
+        $creative->name = 'hz';//TODO
         $creative->brand = 'ООО "Точка знаний"';
-        $creative->category = 'категория';
-        $creative->description = 'description';//$lead->cf('Креатив')->getValue();
+        $creative->category = $lead->cf('Тип рекламы')->getValue();
+        $creative->description = 'description';//$lead->cf('Креатив')->getValue(); TODO
         $creative->pay_type = 'cpc';
         /*
          * cpa — Cost Per Action, цена за действие.
@@ -74,6 +74,5 @@ other — иное.
         $transaction->erid   = $result->erid;
         $transaction->marker = $result->marker;
         $transaction->save();
-//        $creative->flags = [];
     }
 }
