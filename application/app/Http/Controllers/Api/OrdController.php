@@ -16,8 +16,9 @@ class OrdController extends Controller
             'lead_id' => $request->leads['status'][0]['id'],
         ]);
 
-        Artisan::call('ord:create-person',   ['transaction' => $transaction]);
-        Artisan::call('ord:create-contract', ['transaction' => $transaction]);
-        Artisan::call('ord:create-creative', ['transaction' => $transaction]);
+        Artisan::call('ord:create-person',   ['transaction' => $transaction->id]);
+        Artisan::call('ord:create-contract', ['transaction' => $transaction->id]);
+        Artisan::call('ord:create-pad',      ['transaction' => $transaction->id]);
+        Artisan::call('ord:create-creative', ['transaction' => $transaction->id]);
     }
 }

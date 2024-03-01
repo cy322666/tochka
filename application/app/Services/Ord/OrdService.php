@@ -2,17 +2,25 @@
 
 namespace App\Services\Ord;
 
-
 use Illuminate\Http\Client\Response;
 
 class OrdService
 {
-    public static string $baseUrl = 'https://api-sandbox.ord.vk.com'; //'https://api.ord.vk.com'
+    public static string $env;
+    public static string $token;
+    public static string $baseUrl;
+
+    public function __construct(string $env = 'local')
+    {
+        static::$env = $env;
+        static::$baseUrl = static::$env == 'local' ? 'https://api-sandbox.ord.vk.com' : 'https://api.ord.vk.com';
+        static::$token   = static::$env == 'local' ? env('ORD_TOKEN_LOCAL') : env('ORD_TOKEN_PROD');
+    }
 
     public function getHeaders(): array
     {
         return [
-            'Authorization' => 'Bearer '.env('ORD_TOKEN'),
+            'Authorization' => 'Bearer '.static::$token,
             'Content-type'  => 'application/json'
         ];
     }
@@ -32,14 +40,24 @@ class OrdService
         return new Creative($this);
     }
 
-    public function invoice(): Invoce
+    public function invoice(): Invoice
     {
-        return new Invoce($this);
+        return new Invoice($this);
     }
 
-    public function parseResponse(Response $response)
+    public function pad(): Pad
     {
-        return json_decode($response->body());
+        return new Pad($this);
     }
 
+    public static function parseResponse(Response $response)
+    {
+        $body = json_decode($response->body());
+
+        if (empty($body->external_ids) || count($body->external_ids) == 0)
+
+            return false;
+        else
+            return $body;
+    }
 }

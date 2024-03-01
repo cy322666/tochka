@@ -3,8 +3,11 @@
 namespace App\Console\Commands\Api\Ord;
 
 use App\Models\Account;
+use App\Models\Api\Ord\Contract;
+use App\Models\Api\Ord\Transaction;
 use App\Services\amoCRM\Client;
 use App\Services\Ord\OrdService;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Ramsey\Uuid\Uuid;
 
@@ -15,7 +18,7 @@ class CreateInvoice extends Command
      *
      * @var string
      */
-    protected $signature = 'ord:create-invoice';
+    protected $signature = 'ord:create-invoice {transaction}';
 
     /**
      * The console command description.
@@ -30,23 +33,70 @@ class CreateInvoice extends Command
      */
     public function handle()
     {
-        $transaction = $this->argument('transaction');
+        $transaction = Transaction::query()->find($this->argument('transaction'));
 
-        $amoApi = (new Client(Account::query()->first()))->init();
         $ordApi = new OrdService();
+        $amoApi = (new Client(
+            Account::query()
+                ->where('subdomain', 'tochkaznanij')
+                ->first()
+        ))->init();
 
-        $lead    = $amoApi->service->leads()->find(44622459);
+        $lead    = $amoApi->service->leads()->find($transaction->lead_id);
         $invoice = $ordApi->invoice();
 
+        $files = $amoApi->service->ajax()->get('/api/v4/leads/'.$lead->id.'/files', []);
+//        $files = $amoApi->service->ajax()->get('/api/v4/account', ['with' => 'drive_url']);
+
+        foreach ($files->_embedded->files as $file) {
+//dd('/v1.0/files/'.$file->file_uuid);
+            $fileDetail = $amoApi->service->ajax()->get('/v1.0/files/'.$file->file_uuid.'/versions', []);
+//https://tochkaznanij.amocrm.ru/v1.0/files/7e926760-1a23-4f86-a661-346f9eb7c4e4"
+            dd($fileDetail);
+        }
+
+        $date = Carbon::parse($lead->cf('Дата рекламы')->getValue())->format('Y-m-d') ?? Carbon::now()->format('Y-m-d');
+        $dateExpose = Carbon::parse($lead->cf('Дата выставления (акта)')->getValue())->format('Y-m-d') ?? Carbon::now()->format('Y-m-d');
+        $dateStart = Carbon::parse($lead->cf('Дата рекламы факт')->getValue())->format('Y-m-d') ?? Carbon::now()->format('Y-m-d');
+        $dateEnd = Carbon::parse($lead->cf('Дата окончания факт')->getValue())->format('Y-m-d') ?? Carbon::now()->format('Y-m-d');
+        $dateEndPlan = Carbon::parse($lead->cf('Дата окончания план')->getValue())->format('Y-m-d') ?? Carbon::now()->format('Y-m-d');
+
+        //бюджет / Количество показов, тыс
+
+        //НДС включён в сумму акта - галочки нет
         $invoice->uuid = Uuid::uuid4();
-        $invoice->contract_external_id = '11724b84-2ac2-4f09-9494-f0316a5313de';
-//        $invoice->date = ;
-//        $invoice->serial = ;
-//        $invoice->date_start = ;
-//        $invoice->date_end = ;
-//        $invoice->amount = ;
-//        $invoice->client_role = ;
-//        $invoice->contractor_role = ;
-//        $invoice->create();
+        $invoice->contract_external_id = $transaction->contract_uuid;
+        $invoice->date = $dateExpose;
+        $invoice->date_start = $dateStart;
+        $invoice->date_end = $dateEnd;
+        $invoice->amount = $lead->sale;
+        $invoice->client_role = 'agency';
+        $invoice->contractor_role = 'publisher';
+        $invoice->serial = $transaction->contract_serial;
+
+        $result = $invoice->create();
+
+        if (empty($result->error)) {
+
+            $transaction->invoice_uuid = $invoice->uuid;
+            $transaction->save();
+
+            $invoice->pad_external_id = $transaction->pad_uuid;
+            $invoice->creative_external_id = $transaction->creative_uuid;
+            $invoice->date_start_planned = $date;
+            $invoice->date_end_planned  = $dateEndPlan;
+            $invoice->date_start_actual = $dateStart;
+            $invoice->date_end_actual   = $dateEnd;
+            $invoice->invoice_shows_count = $lead->cf('Количество показов')->getValue();
+            $invoice->shows_count = $lead->cf('Количество показов')->getValue();
+            $invoice->amount = $lead->sale;
+            $invoice->amount_per_event = $invoice->amount / $invoice->shows_count;
+
+            $result = $invoice->add();
+
+            dd($result);
+
+        } else
+            dd(__METHOD__.' : '.$result->error);
     }
 }

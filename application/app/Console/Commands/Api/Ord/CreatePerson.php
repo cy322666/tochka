@@ -4,6 +4,7 @@ namespace App\Console\Commands\Api\Ord;
 
 use App\Models\Account;
 use App\Models\Api\Ord\Person;
+use App\Models\Api\Ord\Transaction;
 use App\Services\amoCRM\Client;
 use App\Services\Ord\OrdService;
 use Illuminate\Console\Command;
@@ -31,7 +32,7 @@ class CreatePerson extends Command
      */
     public function handle()
     {
-        $transaction = $this->argument('transaction');
+        $transaction = Transaction::query()->find($this->argument('transaction'));
 
         $amoApi = (new Client(
             Account::query()
@@ -57,14 +58,15 @@ class CreatePerson extends Command
             $person->type  = Person::matchType($company->cf('Тип')->getValue());
             $person->inn   = $company->cf('ИНН')->getValue();
             $person->phone = $company->cf('Телефон')->getValue();
+            $person->role  = 'publisher';
             $person->create();
 
-            $transaction->uuid_person = $person->uuid;
-            $transaction->phone = $person->phone;
-            $transaction->name = $person->name;
-            $transaction->type = $person->type;
-            $transaction->inn  = $person->inn;
-            $transaction->save();
+            if (empty($result->error)) {
+
+                $transaction->person_uuid = $person->uuid;
+                $transaction->save();
+            } else
+                dd(__METHOD__.' : '.$result->error);
         } else
             $transaction->person_uuid = $searchPerson->uuid;
 
@@ -73,7 +75,5 @@ class CreatePerson extends Command
         $transaction->company_id = $company->id;
         $transaction->contact_id = $lead->contact->id;
         $transaction->save();
-
-//        $person->rs_url;
     }
 }

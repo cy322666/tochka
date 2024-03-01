@@ -15,6 +15,8 @@ class Transaction extends Model
         'person_uuid',
         'contract_uuid',
         'creative_uuid',
+        'pad_uuid',
+        'invoice_uuid',
         'lead_id',
         'contact_id',
         'company_id',

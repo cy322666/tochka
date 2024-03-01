@@ -27,22 +27,35 @@ class GetPersons extends Command
      */
     public function handle()
     {
-        $persons = (new OrdService())->person()->list();
+        $persons = (new OrdService('prod'))->person()->list();
 
-        foreach ($persons as $person) {
+        if (count($persons) !== Person::query()->count()) {
 
-            $detail = (new OrdService())->person()->get($person);
+            foreach ($persons as $person) {
 
-            Person::query()->updateOrCreate(['uuid' => $person], [
-                'create_date' => $detail->create_date,
-                'name'   => $detail->name ?? null,
-                'roles'  => json_encode($detail->roles) ?? null,
-                'juridical_details' => json_encode($detail->juridical_details) ?? null,
-                'type'   => $detail->juridical_details->type ?? null,
-                'phone'  => $detail->juridical_details->phone ?? null,
-                'inn'    => $detail->juridical_details->inn ?? null,
-                'rs_url' => $detail->juridical_details->rs_url ?? null,
-            ]);
+                try {
+                    if(!Person::query()
+                        ->whereUuid($person)
+                        ->exists()) {
+
+                        $detail = (new OrdService('prod'))->person()->get($person);
+
+                        Person::query()->create([
+                            'uuid' => $person,
+                            'juridical_details' => json_encode($detail->juridical_details) ?? null,
+                            'create_date' => $detail->create_date,
+                            'name'  => $detail->name ?? null,
+                            'roles' => json_encode($detail->roles) ?? null,
+                            'type'  => $detail->juridical_details->type ?? null,
+                            'phone' => $detail->juridical_details->phone ?? null,
+                            'inn'   => $detail->juridical_details->inn ?? null,
+//                          'rs_url' => $detail->juridical_details->rs_url ?? null,
+                        ]);
+                    }
+                } catch (\Throwable $e) {
+                    dump($e->getMessage().' '.$e->getFile().' '.$e->getLine());
+                }
+            }
         }
     }
 }

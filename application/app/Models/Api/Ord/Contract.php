@@ -20,6 +20,7 @@ class Contract extends Model
         'subject_type',
         'date',
         'serial',
+        'parent_contract_external_id',
     ];
 
     public static function getSerialName(string $parentSerial)
@@ -30,7 +31,7 @@ class Contract extends Model
             ->first();
 
         $lastContractForParent = Contract::query()
-            ->where('uuid', $parent->uuid)
+            ->where('parent_contract_external_id', $parent->uuid)
             ->orderBy('id', 'DESC')
             ->first();
 

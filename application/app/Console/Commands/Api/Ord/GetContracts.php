@@ -3,6 +3,7 @@
 namespace App\Console\Commands\Api\Ord;
 
 use App\Models\Api\Ord\Contract;
+use App\Models\Api\Ord\Person;
 use App\Services\Ord\OrdService;
 use Illuminate\Console\Command;
 
@@ -27,21 +28,35 @@ class GetContracts extends Command
      */
     public function handle()
     {
-        $contracts = (new OrdService())->contract()->list();
+        $contracts = (new OrdService('prod'))->contract()->list();
 
-        foreach ($contracts as $contract) {
+        if (count($contracts) !== Contract::query()->count()) {
 
-            $detail = (new OrdService())->contract()->get($contract);
+            foreach ($contracts as $contract) {
 
-            Contract::query()->updateOrCreate(['uuid' => $contract], [
-                'client_external_id'     => $detail->client_external_id,
-                'contractor_external_id' => $detail->contractor_external_id,
-                'create_date'  => $detail->create_date,
-                'subject_type' => $detail->subject_type,
-                'type'   => $detail->type,
-                'date'   => $detail->date,
-                'serial' => $detail->serial,
-            ]);
+                try {
+                    if(!Contract::query()
+                        ->whereUuid($contract)
+                        ->exists()) {
+
+                        $detail = (new OrdService('prod'))->contract()->get($contract);
+
+                        Contract::query()->create([
+                            'uuid' => $contract,
+                            'client_external_id' => $detail->client_external_id,
+                            'contractor_external_id' => $detail->contractor_external_id,
+                            'parent_contract_external_id' => $detail->parent_contract_external_id ?? null,
+                            'create_date' => $detail->create_date,
+                            'subject_type' => $detail->subject_type,
+                            'type' => $detail->type,
+                            'date' => $detail->date,
+                            'serial' => $detail->serial,
+                        ]);
+                    }
+                } catch (\Throwable $e) {
+                    dump($e->getMessage().' '.$e->getFile().' '.$e->getLine());
+                }
+            }
         }
     }
 }

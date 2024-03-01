@@ -16,34 +16,34 @@ class Person
 
     public function __construct(public OrdService $service) {}
 
+    /**
+     * @throws \Exception
+     */
     public function create()
     {
-        $response = Http::withHeaders($this->service->getHeaders())
+        return Http::withHeaders($this->service->getHeaders())
             ->put($this->service::$baseUrl.'/v1/person/'.$this->uuid, [
                 'name'  => $this->name,
                 'roles' => [ $this->role ],
                 'juridical_details' => [
                     'type'  => $this->type,
                     'inn'   => $this->inn,
-                    'phone' => $this->phone,
+//                    'phone' => $this->phone,
 //                    'rs_url'=> $this->rs_url ?? null,
                 ],
-            ]);
-
-        return $this->service->parseResponse($response);
+            ])->object();
     }
 
-    public function get(string $id)
+    public function get(string $id): ?object
     {
-        $response = Http::withHeaders($this->service->getHeaders())
-            ->get($this->service::$baseUrl.'/v1/person/'.$id);
-
-        return $this->service->parseResponse($response);
+        return Http::withHeaders($this->service->getHeaders())
+            ->get($this->service::$baseUrl.'/v1/person/'.$id)
+            ->object();
     }
 
     public function list(): array
     {
-        for ($offset = 0, $limit = 100, $persons = [] ; $offset < 200 ; $offset += $limit) {
+        for ($offset = 0, $limit = 100, $persons = [] ; ; $offset += $limit) {
 
             $response = Http::withHeaders($this->service->getHeaders())
                 ->get($this->service::$baseUrl.'/v1/person', [
@@ -51,12 +51,16 @@ class Person
                     'offset' => $offset,
                 ]);
 
-            $persons = array_merge(
-                (array)($this->service->parseResponse($response))->external_ids,
-                $persons
-            );
-        }
+            $response = OrdService::parseResponse($response);
 
+            if ($response)
+                $persons = array_merge(
+                    (array)$response->external_ids,
+                    $persons
+                );
+            else
+                break;
+        }
         return $persons;
     }
 
@@ -68,20 +72,4 @@ class Person
 
         return $this;
     }
-
-        /*
- * {
-"": "Иванов Сергей Петрович",
-"": [
-"advertiser",
-"agency"
-],
-"": {
-"": "",
-"": "727718317746",
-"": "+7(495)709-56-39"
-}
-}
- */
-
 }

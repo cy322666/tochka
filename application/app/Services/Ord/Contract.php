@@ -13,7 +13,7 @@ class Contract
     public string $contractor_external_id;
     public string $date;//"2022-12-01"
     public string $serial;
-    public string $action_type;
+//    public string $action_type;
     public string $subject_type;
     public string $parent_contract_external_id;
     public string $amount;//"500.5"
@@ -22,7 +22,7 @@ class Contract
 
     public function create()
     {
-        $response = Http::withHeaders($this->service->getHeaders())
+        return Http::withHeaders($this->service->getHeaders())
             ->put($this->service::$baseUrl.'/v1/contract/'.$this->uuid, [
                 "type" => $this->type,
                 "client_external_id" => $this->client_external_id,
@@ -31,24 +31,21 @@ class Contract
                 "serial" => $this->serial,
 //                "action_type" => $this->action_type,
                 "subject_type" => $this->subject_type,//TODO
-                "parent_contract_external_id" => $this->parent_contract_external_id,
+                "parent_contract_external_id" => $this->parent_contract_external_id ?? null,
 //                "amount" => $this->amount,
-            ]);
-
-        return $this->service->parseResponse($response);
+            ])->object();
     }
 
-    public function get(string $id)
+    public function get(string $id): ?object
     {
-        $response = Http::withHeaders($this->service->getHeaders())
-            ->get($this->service::$baseUrl.'/v1/contract/'.$id);
-
-        return $this->service->parseResponse($response);
+        return Http::withHeaders($this->service->getHeaders())
+            ->get($this->service::$baseUrl.'/v1/contract/'.$id)
+            ->object();
     }
 
     public function list(): array
     {
-        for ($offset = 0, $limit = 1, $persons = [] ; $offset < 3; $offset += $limit) {
+        for ($offset = 0, $limit = 100, $persons = [] ; ; $offset += $limit) {
 
             $response = Http::withHeaders($this->service->getHeaders())
                 ->get($this->service::$baseUrl.'/v1/contract', [
@@ -56,12 +53,13 @@ class Contract
                     'offset' => $offset,
                 ]);
 
-            $persons = array_merge(
-                (array)($this->service->parseResponse($response))->external_ids,
-                $persons
-            );
-        }
+            $response = OrdService::parseResponse($response);
 
+            if ($response)
+                $persons = array_merge($response->external_ids, $persons);
+            else
+                break;
+        }
         return $persons;
     }
 }

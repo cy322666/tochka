@@ -3,8 +3,10 @@
 namespace App\Console\Commands\Api\Ord;
 
 use App\Models\Account;
+use App\Models\Api\Ord\Transaction;
 use App\Services\amoCRM\Client;
 use App\Services\Ord\OrdService;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Ramsey\Uuid\Uuid;
 
@@ -30,49 +32,41 @@ class CreateCreative extends Command
      */
     public function handle()
     {
-        $transaction = $this->argument('transaction');
+        $transaction = Transaction::query()->find($this->argument('transaction'));
 
         $amoApi = (new Client(Account::query()->first()))->init();
         $ordApi = new OrdService();
 
-        $lead     = $amoApi->service->leads()->find($transaction->lead_id);
+        $contact = $amoApi->service->contacts()->find($transaction->contact_id);
+        $lead    = $amoApi->service->leads()->find($transaction->lead_id);
+
+        $creativeName = Carbon::now()->format('m.d').'_'.$contact->cf('Ник блогера')->getValue().'_'.$lead->cf('Название креатива')->getValue();
+
         $creative = $ordApi->creative();
 
         $creative->uuid  = Uuid::uuid4();
         $creative->contract_external_id = $transaction->contract_uuid;
-        $creative->name = 'hz';//TODO
+        $creative->name = $creativeName;
         $creative->brand = 'ООО "Точка знаний"';
-        $creative->category = $lead->cf('Тип рекламы')->getValue();
-        $creative->description = 'description';//$lead->cf('Креатив')->getValue(); TODO
-        $creative->pay_type = 'cpc';
-        /*
-         * cpa — Cost Per Action, цена за действие.
-cpc — Cost Per Click, цена за клик.
-cpm — Cost Per Millennium, цена за 1 000 показов.
-other
-         */
-        $creative->form = 'text_block';
-        /*
-         * banner — баннер.
-text_block — текстовый блок.
-text_graphic_block — текстово-графический блок.
-audio — аудиозапись.
-video — видеоролик.
-live_audio — аудиотрансляция в прямом эфире.
-live_video — видеотрансляция в прямом эфире.
-other — иное.
-         */
-        $creative->targeting = 'Весь интернет';
-//        $creative->target_urls = 'https://product?article=3085223-childrens';
-        $creative->target_urls = ['https://google.com'];
-        $creative->texts = ['textextextextext'];
-        $creative->media_external_ids = ['https://google.com'];
+        $creative->pay_type = 'cpm';
+        $creative->form = $lead->cf('Форма креатива')->getValue();
+        $creative->target_urls = [$lead->cf('Аккаунт')->getValue()];
+        $creative->texts = [$lead->cf('Текст креатива')->getValue()];
+        $creative->media_external_ids = [$lead->cf('Ссылка на медиа')->getValue()];
         $creative->media_urls = ['https://google.com'];
 
         $result = $creative->create();
 
-        $transaction->erid   = $result->erid;
-        $transaction->marker = $result->marker;
-        $transaction->save();
+        if (empty($result->error)) {
+
+            $transaction->erid   = $result->erid;
+            $transaction->marker = $result->marker;
+            $transaction->creative_uuid = $creative->uuid;
+            $transaction->status = true;
+            $transaction->save();
+        } else
+            dd(__METHOD__.' : '.$result->error);
+
+        //TODO erid + market to lead
     }
 }

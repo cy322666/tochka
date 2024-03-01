@@ -27,24 +27,22 @@ class Creative
 
     public function create()
     {
-        $response = Http::withHeaders($this->service->getHeaders())
-            ->put($this->service::$baseUrl.'/v2/creative/'.$this->uuid, [
+        return Http::withHeaders($this->service->getHeaders())
+            ->put($this->service::$baseUrl.'/v1/creative/'.$this->uuid, [
                 "contract_external_id" => $this->contract_external_id,
                 "okveds" => [$this->okveds],
                 "name" => $this->name,
                 "brand" => $this->brand,
-                "category" => $this->category,
-                "description" => $this->description,
+//                "category" => $this->category,
+//                "description" => $this->description,
                 "pay_type" => $this->pay_type,
                 "form" => $this->form,
-                "targeting" => $this->targeting,
-                "target_urls" => $this->target_urls,
+//                "targeting" => $this->targeting,
+                "target_urls" => [$this->target_urls],
                 "texts" => $this->texts,
                 "media_external_ids" => $this->media_external_ids,
                 "media_urls" => $this->media_urls,
-            ]);
-
-        return $this->service->parseResponse($response);
+            ])->object();
     }
 
     public function get(string $id)
@@ -57,7 +55,7 @@ class Creative
 
     public function list(): array
     {
-        for ($offset = 0, $limit = 1, $persons = [] ; $offset < 3; $offset += $limit) {
+        for ($offset = 0, $limit = 1, $persons = [] ; ; $offset += $limit) {
 
             $response = Http::withHeaders($this->service->getHeaders())
                 ->get($this->service::$baseUrl.'/v1/creative', [
