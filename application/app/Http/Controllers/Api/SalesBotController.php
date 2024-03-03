@@ -12,13 +12,6 @@ class SalesBotController extends Controller
 {
     public function filterContecst(Request $request)
     {
-        $hook = FilterContecst::query()->create([
-            'list_id' => $request->list,
-            'lead_id' => $request->amo_lead_id,
-            'client_id'  => $request->client_id,
-            'contact_id' => $request->amo_client_id,
-        ]);
-
-        GetHook::dispatch($hook);
+        GetHook::dispatch($request);
     }
 }
