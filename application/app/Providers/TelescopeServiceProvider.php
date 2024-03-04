@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Gate;
 use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;
 use Laravel\Telescope\TelescopeApplicationServiceProvider;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 {
@@ -35,17 +37,14 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
      */
     protected function hideSensitiveRequestDetails(): void
     {
-        if ($this->app->environment('local')) {
-            return;
+        try {
+            if ($this->app->environment('local') ||
+                request()->get('show')) {
+                return;
+            }
+        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+            dd($e->getMessage());
         }
-
-        Telescope::hideRequestParameters(['_token']);
-
-        Telescope::hideRequestHeaders([
-            'cookie',
-            'x-csrf-token',
-            'x-xsrf-token',
-        ]);
     }
 
     /**
