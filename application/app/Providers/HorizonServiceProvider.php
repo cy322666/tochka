@@ -8,6 +8,13 @@ use Laravel\Horizon\HorizonApplicationServiceProvider;
 
 class HorizonServiceProvider extends HorizonApplicationServiceProvider
 {
+    protected function authorization()
+    {
+        Horizon::auth(function () {
+            return true;
+        });
+    }
+
     /**
      * Bootstrap any application services.
      */
@@ -27,8 +34,8 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      */
     protected function gate(): void
     {
-        Gate::define('viewHorizon', function ($user) {
-            return;
+        Gate::define('viewHorizon', function ($user = null) {
+            return true;
 //            return in_array($user->email, [
 //                //
 //            ]);
