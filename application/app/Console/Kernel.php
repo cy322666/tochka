@@ -12,7 +12,13 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+//         $schedule->command('messages:incoming')->everyFiveMinutes();
+
+        $schedule->command('telescope:prune --hours=72')->daily();
+
+        $schedule->command('ord:get-persons')->everyFiveMinutes();
+        $schedule->command('ord:get-contracts')->everyTenMinutes();
+        $schedule->command('ord:get-pads')->everyTenMinutes();
     }
 
     /**
