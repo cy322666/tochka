@@ -14,6 +14,7 @@ class FilterContecst extends Model
     protected $fillable = [
         'lead_id',
         'contact_id',
+        'client_id',
         'list_id',
         'salesbot_id',
         'status_id',
