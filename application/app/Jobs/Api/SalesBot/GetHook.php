@@ -15,9 +15,9 @@ class GetHook implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public Request $request)
+    public function onQueue($queue)
     {
-        $this->onQueue('salesbot-filter');
+        $queue->onQueue('salesbot-filter');
     }
 
     public function tags(): array
