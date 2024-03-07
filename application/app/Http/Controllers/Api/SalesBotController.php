@@ -12,6 +12,6 @@ class SalesBotController extends Controller
 {
     public function filterContecst(Request $request)
     {
-        GetHook::dispatch($request);
+        GetHook::dispatch($request->all());
     }
 }
