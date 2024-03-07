@@ -14,7 +14,7 @@ class SaleBot
     {
         return Http::post(static::$baseUrl.$this->token.'/remove_from_list', [
             'list_id' => $listId,
-            'clients' => $clientId,
+            'clients' => [$clientId],
         ])->object();
     }
 }
