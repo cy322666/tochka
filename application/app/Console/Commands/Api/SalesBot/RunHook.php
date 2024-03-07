@@ -7,10 +7,11 @@ use App\Models\Api\SalesBot\FilterContecst;
 use App\Services\amoCRM\Client;
 use App\Services\SaleBot;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class RunHook extends Command
 {
-    protected $signature = 'salesbot:run-hook-filter-contecst {hook}';
+    protected $signature = 'salesbot:run-hook-filter-contecst {hook}}';
 
     protected $description = 'Проверка и отписка в списке Salebot ...';
 
@@ -23,30 +24,36 @@ class RunHook extends Command
         7566598, //prob
     ];
 
-    //list_id
-
     /**
      * @throws \Exception
      */
     public function handle()
     {
-        $amoApi = (new Client(Account::query()->first()))->init();
+        try {
+            $hook = $this->argument('hook');
 
-        $hook = $this->argument('hook');
+            $amoApi = (new Client(Account::query()->first()))->init();
 
-        $saleLead = $amoApi->service->ajax()->get('/api/v4/leads/16727041');
+            $saleLead = $amoApi->service->ajax()->get('/api/v4/leads/'.$hook->lead_id);
 
-        if (in_array($saleLead->pipeline_id, static::$pipelines)) {
+            if (in_array($saleLead->pipeline_id, static::$pipelines) &&
+                $saleLead->status_id != 142 &&
+                $saleLead->status_id != 143) {
 
-            $response = (new SaleBot())->unsubscribe();
+                (new SaleBot())->unsubscribe($hook->list_id, $hook->client_id);
 
-            dd($response);
+                $hook->in_sales = true;
+            }
 
-            $hook->in_sales = true;
-            //отписываем
+            $hook->status = 1;
+            $hook->save();
+
+        } catch (\Throwable $e) {
+
+            Log::error(__METHOD__.' : '.$e->getMessage().' '.$e->getFile().' '.$e->getLine());
+
+            $hook->status = 3;
+            $hook->save();
         }
-
-        $hook->status = 1;
-        $hook->save();
     }
 }
