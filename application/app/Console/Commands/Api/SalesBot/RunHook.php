@@ -40,7 +40,7 @@ class RunHook extends Command
                 $saleLead->status_id != 142 &&
                 $saleLead->status_id != 143) {
 
-                (new SaleBot(env('SALEBOT_TOKEN')))->unsubscribe($hook->list_id, $hook->client_id);
+//                (new SaleBot(env('SALEBOT_TOKEN')))->unsubscribe($hook->list_id, $hook->client_id);
 
                 $hook->in_sales = true;
             }
