@@ -45,6 +45,7 @@ class RunHook extends Command
                 $hook->in_sales = true;
             }
 
+            $hook->pipeline_id = $saleLead->pipeline_id;
             $hook->status = 1;
             $hook->save();
 
