@@ -186,7 +186,7 @@ return [
         'supervisor-1' => [
             'connection' => 'redis',
             'queue' => [
-                'default',
+//                'default',
                 'salesbot-filter',
             ],
             'balance' => 'auto',
