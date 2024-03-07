@@ -18,9 +18,9 @@ class GetHook implements ShouldQueue
     public int $tries = 1;
     public int $timeout = 10;
 
-    public Request $request;
+    public array $request;
 
-    public function __construct(Request $request)
+    public function __construct(array $request)
     {
         $this->request = $request;
         $this->onQueue('salesbot-filter');
@@ -37,10 +37,10 @@ class GetHook implements ShouldQueue
     public function handle()
     {
         $hook = FilterContecst::query()->create([
-            'list_id' => $this->request->list,
-            'lead_id' => $this->request->amo_lead_id ?? null,
-            'client_id'  => $this->request->client_id,
-            'contact_id' => $this->request->amo_client_id ?? null,
+            'list_id' => $this->request['list'],
+            'lead_id' => $this->request['amo_lead_id'] ?? null,
+            'client_id'  => $this->request['client_id'],
+            'contact_id' => $this->request['amo_client_id'] ?? null,
         ]);
 
         Artisan::call('salesbot:run-hook-filter-contecst', ['hook' => $hook]);
