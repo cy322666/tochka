@@ -17,4 +17,12 @@ class SaleBot
             'clients' => [$clientId],
         ])->object();
     }
+
+    public function subscribe(int $listId, int $clientId): ?object
+    {
+        return Http::post(static::$baseUrl.$this->token.'/add_to_list', [
+            'list_id' => $listId,
+            'clients' => [$clientId],
+        ])->object();
+    }
 }
