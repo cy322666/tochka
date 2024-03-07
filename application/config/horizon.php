@@ -186,9 +186,7 @@ return [
             'connection' => 'redis',
             'queue' => [
                 'default',
-//                'backups',
-
-//                'bizon_form',
+                'salesbot-filter',
             ],
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
@@ -197,18 +195,18 @@ return [
             'maxJobs' => 0,
             'memory' => 512,
             'tries' => 1,
-            'timeout' => 60,
+            'timeout' => 30,
             'nice' => 0,
         ],
     ],
 
     'environments' => [
         'production' => [
-            'supervisor-1' => [
-                'maxProcesses' => 10,
-                'balanceMaxShift' => 1,
-                'balanceCooldown' => 3,
-            ],
+//            'supervisor-1' => [
+//                'maxProcesses' => 10,
+//                'balanceMaxShift' => 1,
+//                'balanceCooldown' => 3,
+//            ],
             'salesbot-filter' => [
                 'maxProcesses' => 3,
                 'balanceMaxShift' => 1,
