@@ -186,7 +186,7 @@ return [
             'connection' => 'redis',
             'queue' => [
                 'default',
-                'salesbot-filter',
+//                'salesbot-filter',
             ],
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
@@ -207,11 +207,11 @@ return [
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
-            'salesbot-filter' => [
-                'maxProcesses' => 3,
-                'balanceMaxShift' => 1,
-                'balanceCooldown' => 3,
-            ],
+//            'salesbot-filter' => [
+//                'maxProcesses' => 3,
+//                'balanceMaxShift' => 1,
+//                'balanceCooldown' => 3,
+//            ],
         ],
 
         'local' => [
