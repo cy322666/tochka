@@ -186,7 +186,7 @@ return [
             'connection' => 'redis',
             'queue' => [
                 'default',
-//                'salesbot-filter',
+                'salesbot-filter',
             ],
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
@@ -203,15 +203,15 @@ return [
     'environments' => [
         'production' => [
             'supervisor-1' => [
-                'maxProcesses' => 10,
+                'maxProcesses' => 20,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
-//            'salesbot-filter' => [
-//                'maxProcesses' => 3,
-//                'balanceMaxShift' => 1,
-//                'balanceCooldown' => 3,
-//            ],
+            'salesbot-filter' => [
+                'maxProcesses' => 3,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
         ],
 
         'local' => [
