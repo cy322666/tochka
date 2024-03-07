@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\MessagesController;
 use App\Http\Controllers\Api\OrdController;
+use App\Http\Controllers\Api\SalesBotController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,3 +20,5 @@ use Illuminate\Support\Facades\Route;
 Route::post('ord/hook', [OrdController::class, 'hook']);
 
 Route::post('msg/hook', [MessagesController::class, 'hook']);
+
+Route::post('salesbot/filter/contects-hook', [SalesBotController::class, 'filterContecst']);
