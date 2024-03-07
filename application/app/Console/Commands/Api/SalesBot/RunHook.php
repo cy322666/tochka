@@ -32,7 +32,7 @@ class RunHook extends Command
         try {
             $hook = $this->argument('hook');
 
-            $amoApi = (new Client(Account::query()->first()))->init();
+            $amoApi = (new Client(Account::query()->find(6)))->init();
 
             $saleLead = $amoApi->service->ajax()->get('/api/v4/leads/'.$hook->lead_id);
 
