@@ -16,7 +16,7 @@ class Contract
 //    public string $action_type;
     public string $subject_type;
     public string $parent_contract_external_id;
-    public string $amount;//"500.5"
+//    public string $amount;//"500.5"
 
     public function __construct(public OrdService $service) {}
 
@@ -29,10 +29,8 @@ class Contract
                 "contractor_external_id" => $this->contractor_external_id,
                 "date" => $this->date,
                 "serial" => $this->serial,
-//                "action_type" => $this->action_type,
-                "subject_type" => $this->subject_type,//TODO
+                "subject_type" => $this->subject_type,
                 "parent_contract_external_id" => $this->parent_contract_external_id ?? null,
-//                "amount" => $this->amount,
             ])->object();
     }
 

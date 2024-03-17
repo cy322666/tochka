@@ -26,5 +26,6 @@ class Transaction extends Model
         'creative_uuid',
         'parent_contract_external_id',
         'contract_serial',
+        'media',
     ];
 }

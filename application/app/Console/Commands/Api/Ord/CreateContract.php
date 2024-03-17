@@ -7,6 +7,7 @@ use App\Models\Api\Ord\Contract;
 use App\Models\Api\Ord\Person;
 use App\Models\Api\Ord\Transaction;
 use App\Services\amoCRM\Client;
+use App\Services\amoCRM\Models\Notes;
 use App\Services\Ord\OrdService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -35,23 +36,22 @@ class CreateContract extends Command
      */
     public function handle()
     {
-        //TODO создаем и базовый если его нет
         //ищем базовый
         //если нет создаем
         //если есть то крепим
         $transaction = Transaction::query()->find($this->argument('transaction'));
 
-        $amoApi = (new Client(Account::query()->first()))->init();
-        $ordApi = new OrdService();
+        $ordApi = new OrdService('prod');
+        $amoApi = (new Client(
+            Account::query()
+                ->where('subdomain', 'tochkaznanij')
+                ->first()
+        ))->init();
 
         $lead = $amoApi->service->leads()->find($transaction->lead_id);
 
-        $searchPerson = Person::query()
-            ->where('uuid', $transaction->person_uuid)
-            ->first();
-
         $searchBaseContract = Contract::query()
-            ->where('client_external_id', $searchPerson->uuid)//TODO?
+            ->where('contractor_external_id', $transaction->person_uuid)
             ->where('type', 'service')
             ->first();
 
@@ -62,17 +62,17 @@ class CreateContract extends Command
             $contract->uuid = Uuid::uuid4();
             $contract->type = 'service';
             $contract->client_external_id = $transaction->person_uuid;
-            $contract->contractor_external_id = '8yjfa2yw4zm-arzxqw9ww';//TODO точка uuid
+            $contract->contractor_external_id = 'my';
             $contract->date = Carbon::parse($lead->cf('Дата договора')->getValue())->format('Y-m-d');
-            $contract->serial = $lead->cf('Номер договора')->getValue();
+            $contract->serial = $lead->cf('Номер заявки')->getValue();
             $contract->subject_type = 'distribution';
-//            $contract->parent_contract_external_id = $baseContract->uuid;
-//            $contract->amount  = $lead->sale;
             $result = $contract->create();
 
             if (!empty($result->error)) {
 
-                dd(__METHOD__.' : '.$result->error);
+                Notes::addOne($lead, 'Произошла ошибка при создании заявки : '.json_encode($result->error));
+
+                return;
             }
 
             $searchBaseContract = Contract::query()
@@ -92,27 +92,24 @@ class CreateContract extends Command
 
         $contract->uuid = Uuid::uuid4();
         $contract->type = 'additional';
-        $contract->client_external_id = $transaction->person_uuid;
-        $contract->contractor_external_id = '8yjfa2yw4zm-arzxqw9ww';//TODO точка uuid
+        $contract->client_external_id = $searchBaseContract->client_external_id;
+        $contract->contractor_external_id = $searchBaseContract->contractor_external_id;
         $contract->date = Carbon::parse($lead->cf('Дата договора')->getValue())->format('Y-m-d');
-        $contract->serial = Contract::getSerialName($lead->cf('Номер договора')->getValue());
+        $contract->serial = $lead->cf('Номер заявки')->getValue();
         $contract->subject_type = 'distribution';
         $contract->parent_contract_external_id = $searchBaseContract->uuid;
-//        $contract->amount  = $lead->sale;
 
         $result = $contract->create();
 
         if (empty($result->error)) {
 
             $transaction->contract_uuid = $contract->uuid;
-    //            $transaction->contract_date = $contract->date;
             $transaction->contract_serial = $contract->serial;
             $transaction->parent_contract_external_id = $searchBaseContract->uuid;
             $transaction->save();
-        } else
-            dd(__METHOD__.' : '.$result->error);
 
-//        $lead->cf('Номер заявки')->setValue($serial);
-//        $lead->save();
+            Notes::addOne($lead, 'Успешное создание заявки : '."\n".' Договор :'.$searchBaseContract->uuid."\n".' Заявка :'.$contract->uuid);
+        } else
+            Notes::addOne($lead, 'Произошла ошибка при создании заявки : '.json_encode($result->error));
     }
 }

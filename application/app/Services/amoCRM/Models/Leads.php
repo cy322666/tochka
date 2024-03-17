@@ -5,6 +5,7 @@ namespace App\Services\amoCRM\Models;
 
 
 use App\Services\amoCRM\Client;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 use Ufee\Amo\Models\Contact;
@@ -25,6 +26,40 @@ abstract class Leads
                     return $lead['id'];
                 }
             }
+        }
+    }
+
+    public static function getFileLinkByType($amoApi, $account, $lead, $types = ['pdf'])
+    {
+        $files  = $amoApi->service->ajax()->get('/api/v4/leads/'.$lead->id.'/files', []);
+
+        foreach ($files->_embedded->files as $file) {
+
+            $result = Http::withHeaders(['Authorization' => 'Bearer ' . $account->access_token])
+                ->get('https://drive-b.amocrm.ru/v1.0/files/' . $file->file_uuid)
+                ->object();
+
+            if (in_array($result->metadata->extension, $types))
+
+                return $result->_links->download->href;
+        }
+    }
+
+
+    public static function getFileByType($amoApi, $account, $lead, $types = ['pdf'])
+    {
+        $files  = $amoApi->service->ajax()->get('/api/v4/leads/'.$lead->id.'/files', []);
+
+        foreach ($files->_embedded->files as $file) {
+            $result = Http::withHeaders(['Authorization' => 'Bearer ' . $account->access_token])
+                ->get('https://drive-b.amocrm.ru/v1.0/files/' . $file->file_uuid)
+                ->object();
+
+            if (in_array($result->metadata->extension, $types))
+
+                return Http::withHeaders(['Authorization' => 'Bearer ' . $account->access_token])
+                    ->get($result->_links->download->href)
+                    ->body();
         }
     }
 

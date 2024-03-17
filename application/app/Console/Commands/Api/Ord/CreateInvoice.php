@@ -45,16 +45,6 @@ class CreateInvoice extends Command
         $lead    = $amoApi->service->leads()->find($transaction->lead_id);
         $invoice = $ordApi->invoice();
 
-        $files = $amoApi->service->ajax()->get('/api/v4/leads/'.$lead->id.'/files', []);
-//        $files = $amoApi->service->ajax()->get('/api/v4/account', ['with' => 'drive_url']);
-
-        foreach ($files->_embedded->files as $file) {
-//dd('/v1.0/files/'.$file->file_uuid);
-            $fileDetail = $amoApi->service->ajax()->get('/v1.0/files/'.$file->file_uuid.'/versions', []);
-//https://tochkaznanij.amocrm.ru/v1.0/files/7e926760-1a23-4f86-a661-346f9eb7c4e4"
-            dd($fileDetail);
-        }
-
         $date = Carbon::parse($lead->cf('Дата рекламы')->getValue())->format('Y-m-d') ?? Carbon::now()->format('Y-m-d');
         $dateExpose = Carbon::parse($lead->cf('Дата выставления (акта)')->getValue())->format('Y-m-d') ?? Carbon::now()->format('Y-m-d');
         $dateStart = Carbon::parse($lead->cf('Дата рекламы факт')->getValue())->format('Y-m-d') ?? Carbon::now()->format('Y-m-d');

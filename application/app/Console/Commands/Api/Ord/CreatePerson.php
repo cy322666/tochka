@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\Api\Ord\Person;
 use App\Models\Api\Ord\Transaction;
 use App\Services\amoCRM\Client;
+use App\Services\amoCRM\Models\Notes;
 use App\Services\Ord\OrdService;
 use Illuminate\Console\Command;
 use Ramsey\Uuid\Uuid;
@@ -40,7 +41,7 @@ class CreatePerson extends Command
                 ->first()
         ))->init();
 
-        $ordApi = new OrdService();
+        $ordApi = new OrdService('prod'); //TODO
 
         $lead   = $amoApi->service->leads()->find($transaction->lead_id);
         $person = $ordApi->person();
@@ -54,19 +55,20 @@ class CreatePerson extends Command
         if (!$searchPerson) {
 
             $person->uuid  = Uuid::uuid4();
-            $person->name  = $company->name;
+            $person->name  = $company->cf('ФИО')->getValue();
             $person->type  = Person::matchType($company->cf('Тип')->getValue());
             $person->inn   = $company->cf('ИНН')->getValue();
-            $person->phone = $company->cf('Телефон')->getValue();
             $person->role  = 'publisher';
-            $person->create();
+            $result = $person->create();
 
             if (empty($result->error)) {
 
                 $transaction->person_uuid = $person->uuid;
                 $transaction->save();
+
+                Notes::addOne($lead, 'Успешная синхронизация контрагента : '.$transaction->person_uuid);
             } else
-                dd(__METHOD__.' : '.$result->error);
+                Notes::addOne($lead, 'Произошла ошибка при синхронизации контрагента : '.json_encode($result->error));
         } else
             $transaction->person_uuid = $searchPerson->uuid;
 

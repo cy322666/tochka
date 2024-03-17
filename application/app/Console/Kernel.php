@@ -16,6 +16,8 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('telescope:prune --hours=72')->daily();
 
+        $schedule->command('horizon:snapshot')->everyFiveMinutes();
+
         $schedule->command('ord:get-persons')->everyFiveMinutes();
         $schedule->command('ord:get-contracts')->everyTenMinutes();
         $schedule->command('ord:get-pads')->everyTenMinutes();

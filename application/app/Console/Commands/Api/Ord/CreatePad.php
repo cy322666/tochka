@@ -38,8 +38,12 @@ class CreatePad extends Command
     {
         $transaction = Transaction::query()->find($this->argument('transaction'));
 
-        $amoApi = (new Client(Account::query()->first()))->init();
         $ordApi = new OrdService();
+        $amoApi = (new Client(
+            Account::query()
+                ->where('subdomain', 'tochkaznanij')
+                ->first()
+        ))->init();
 
         $lead = $amoApi->service->leads()->find($transaction->lead_id);
         $pad  = $ordApi->pad();

@@ -25,6 +25,14 @@ class OrdService
         ];
     }
 
+    public function getHeadersMedia(): array
+    {
+        return [
+            'Authorization' => 'Bearer '.static::$token,
+            'Content-Type'  => 'multipart/form-data'
+        ];
+    }
+
     public function person(): Person
     {
         return new Person($this);
@@ -48,6 +56,11 @@ class OrdService
     public function pad(): Pad
     {
         return new Pad($this);
+    }
+
+    public function media(): Media
+    {
+        return new Media($this);
     }
 
     public static function parseResponse(Response $response)
