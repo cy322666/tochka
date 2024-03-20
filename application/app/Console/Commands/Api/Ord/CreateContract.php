@@ -108,7 +108,11 @@ class CreateContract extends Command
             $transaction->parent_contract_external_id = $searchBaseContract->uuid;
             $transaction->save();
 
-            Notes::addOne($lead, 'Успешное создание заявки : '."\n".' Договор :'.$searchBaseContract->uuid."\n".' Заявка :'.$contract->uuid);
+            Notes::add($lead, [
+                'Успешное создание заявки : ',
+                ' Договор : '.$searchBaseContract->uuid.' , '.$searchBaseContract->serial,
+                ' Заявка : '.$contract->uuid.' , '.$contract->serial,
+            ]);
         } else
             Notes::addOne($lead, 'Произошла ошибка при создании заявки : '.json_encode($result->error));
     }

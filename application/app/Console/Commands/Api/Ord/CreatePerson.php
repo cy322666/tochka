@@ -66,11 +66,15 @@ class CreatePerson extends Command
                 $transaction->person_uuid = $person->uuid;
                 $transaction->save();
 
-                Notes::addOne($lead, 'Успешная синхронизация контрагента : '.$transaction->person_uuid);
+                Notes::addOne($lead, 'Успешное создание контрагента : '.$transaction->person_uuid);
             } else
                 Notes::addOne($lead, 'Произошла ошибка при синхронизации контрагента : '.json_encode($result->error));
-        } else
+        } else {
+
             $transaction->person_uuid = $searchPerson->uuid;
+
+            Notes::addOne($lead, 'Успешная синхронизация существующего контрагента в ОРД : '.$transaction->person_uuid);
+        }
 
         $ordApi->person()->get($searchPerson ? $searchPerson->uuid : $person->uuid);
 
