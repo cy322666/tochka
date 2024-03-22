@@ -50,7 +50,7 @@ class GetPads extends Command
                         ]);
                     }
                 } catch (\Throwable $e) {
-                    dump($e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine());
+                    Log($e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine());
                 }
             }
         }

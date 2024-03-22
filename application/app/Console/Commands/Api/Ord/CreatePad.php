@@ -8,6 +8,7 @@ use App\Models\Api\Ord\Pad;
 use App\Models\Api\Ord\Person;
 use App\Models\Api\Ord\Transaction;
 use App\Services\amoCRM\Client;
+use App\Services\amoCRM\Models\Notes;
 use App\Services\Ord\OrdService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -61,19 +62,25 @@ class CreatePad extends Command
             $pad->uuid = Uuid::uuid4();
             //$pad->create_date = Carbon::now()->timezone('Europe/Moscow')->format('Y-m-d H:i:s');
             $pad->person_external_id = $transaction->person_uuid;
-            $pad->is_owner = true;//TODO
+            $pad->is_owner = false;
             $pad->type = 'web';
             $pad->name = $lead->cf('Ник блогера')->getValue();
             $pad->url = $lead->cf('Ссылка для площадки')->getValue();
             $pad->create();
 
-            if (empty($result->error))
+            if (empty($result->error)) {
 
                 $transaction->pad_uuid = $pad->uuid;
-            else
-                dd(__METHOD__.' : '.$result->error);
-        } else
+
+                Notes::addOne($lead, implode("\n", ' Успешное создание площадки : '.$pad->uuid));
+            } else
+                Notes::addOne($lead, 'Произошла ошибка при создании площадки : '.json_encode($result->error));
+        } else {
+
             $transaction->pad_uuid = $searchPad->uuid;
+
+            Notes::addOne($lead, implode("\n", ' Успешная синхронизация существующей площадки : '.$pad->uuid));
+        }
 
         $transaction->save();
     }
