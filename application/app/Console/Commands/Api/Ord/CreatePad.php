@@ -79,7 +79,7 @@ class CreatePad extends Command
 
             $transaction->pad_uuid = $searchPad->uuid;
 
-            Notes::addOne($lead, implode("\n", ' Успешная синхронизация существующей площадки : '.$transaction->pad_uuid));
+            Notes::addOne($lead, 'Успешная синхронизация существующей площадки : '.$transaction->pad_uuid);
         }
 
         $transaction->save();
