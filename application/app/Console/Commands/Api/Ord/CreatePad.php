@@ -31,6 +31,9 @@ class CreatePad extends Command
      */
     protected $description = 'Command description';
 
+    const TG_PIPELINE_ID = 6964646;
+    const IG_PIPELINE_ID = 7246822;
+
     /**
      * Execute the console command.
      * @throws \Exception
@@ -59,12 +62,13 @@ class CreatePad extends Command
 
         if (!$searchPad) {
 
+            $name = $lead->pipeline_id == self::IG_PIPELINE_ID ? $lead->cf('Ник блогера')->getValue() : $lead->cf('Название канала')->getValue();
+
             $pad->uuid = Uuid::uuid4();
-            //$pad->create_date = Carbon::now()->timezone('Europe/Moscow')->format('Y-m-d H:i:s');
             $pad->person_external_id = $transaction->person_uuid;
             $pad->is_owner = false;
             $pad->type = 'web';
-            $pad->name = $lead->cf('Ник блогера')->getValue();
+            $pad->name = $name;
             $pad->url = $lead->cf('Ссылка для площадки')->getValue();
             $pad->create();
 
