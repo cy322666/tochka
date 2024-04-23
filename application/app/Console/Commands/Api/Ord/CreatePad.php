@@ -62,7 +62,7 @@ class CreatePad extends Command
 
         if (!$searchPad) {
 
-            $name = $lead->pipeline_id == self::IG_PIPELINE_ID ? $lead->cf('Ник блогера')->getValue() : $contact->cf('Название канала')->getValue();
+            $name = $lead->pipeline_id == self::IG_PIPELINE_ID ? $contact->cf('Ник блогера')->getValue() : $contact->cf('Название канала')->getValue();
 
             $pad->uuid = Uuid::uuid4();
             $pad->person_external_id = $transaction->person_uuid;
