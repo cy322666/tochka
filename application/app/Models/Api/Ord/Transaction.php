@@ -27,5 +27,6 @@ class Transaction extends Model
         'parent_contract_external_id',
         'contract_serial',
         'media',
+        'media_sha',
     ];
 }

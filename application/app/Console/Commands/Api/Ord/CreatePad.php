@@ -31,8 +31,8 @@ class CreatePad extends Command
      */
     protected $description = 'Command description';
 
-    const TG_PIPELINE_ID = 6964646;
-    const IG_PIPELINE_ID = 7246822;
+    const TG_PIPELINE_ID = 7246822;
+    const IG_PIPELINE_ID = 6964646;
 
     /**
      * Execute the console command.
@@ -42,7 +42,7 @@ class CreatePad extends Command
     {
         $transaction = Transaction::query()->find($this->argument('transaction'));
 
-        $ordApi = new OrdService();
+        $ordApi = new OrdService(env('APP_ENV'));
         $amoApi = (new Client(
             Account::query()
                 ->where('subdomain', 'tochkaznanij')
@@ -50,6 +50,8 @@ class CreatePad extends Command
         ))->init();
 
         $lead = $amoApi->service->leads()->find($transaction->lead_id);
+        $contact = $lead->contact;
+
         $pad  = $ordApi->pad();
 
         $searchPerson = Person::query()
@@ -69,14 +71,14 @@ class CreatePad extends Command
             $pad->is_owner = false;
             $pad->type = 'web';
             $pad->name = $name;
-            $pad->url = $lead->cf('Ссылка для площадки')->getValue();
+            $pad->url = $lead->cf('Ссылка для площадки')->getValue() ?? 'https://google.com';
             $pad->create();
 
             if (empty($result->error)) {
 
                 $transaction->pad_uuid = $pad->uuid;
 
-                Notes::addOne($lead, implode("\n", ' Успешное создание площадки : '.$pad->uuid));
+                Notes::addOne($lead,'Успешное создание площадки : '.$pad->uuid);
             } else
                 Notes::addOne($lead, 'Произошла ошибка при создании площадки : '.json_encode($result->error));
         } else {

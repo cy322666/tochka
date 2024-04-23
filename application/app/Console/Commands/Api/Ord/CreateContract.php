@@ -41,7 +41,7 @@ class CreateContract extends Command
         //если есть то крепим
         $transaction = Transaction::query()->find($this->argument('transaction'));
 
-        $ordApi = new OrdService('prod');
+        $ordApi = new OrdService(env('APP_ENV'));
         $amoApi = (new Client(
             Account::query()
                 ->where('subdomain', 'tochkaznanij')

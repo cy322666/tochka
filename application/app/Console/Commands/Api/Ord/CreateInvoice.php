@@ -35,7 +35,7 @@ class CreateInvoice extends Command
     {
         $transaction = Transaction::query()->find($this->argument('transaction'));
 
-        $ordApi = new OrdService();
+        $ordApi = new OrdService(env('APP_ENV'));
         $amoApi = (new Client(
             Account::query()
                 ->where('subdomain', 'tochkaznanij')
@@ -51,9 +51,6 @@ class CreateInvoice extends Command
         $dateEnd = Carbon::parse($lead->cf('Дата окончания факт')->getValue())->format('Y-m-d') ?? Carbon::now()->format('Y-m-d');
         $dateEndPlan = Carbon::parse($lead->cf('Дата окончания план')->getValue())->format('Y-m-d') ?? Carbon::now()->format('Y-m-d');
 
-        //бюджет / Количество показов, тыс
-
-        //НДС включён в сумму акта - галочки нет
         $invoice->uuid = Uuid::uuid4();
         $invoice->contract_external_id = $transaction->contract_uuid;
         $invoice->date = $dateExpose;
@@ -64,29 +61,36 @@ class CreateInvoice extends Command
         $invoice->contractor_role = 'publisher';
         $invoice->serial = $transaction->contract_serial;
 
-        $result = $invoice->create();
+        $invoice->creative_external_id = $transaction->creative_uuid;
+        $invoice->pad_external_id = $transaction->pad_uuid;
+        $invoice->date_start_planned = $dateStart;
+        $invoice->date_end_planned = $dateEndPlan;
+        $invoice->date_start_actual = $dateStart;
+        $invoice->date_end_actual = $dateEnd;
+        $invoice->amount_per_event = $lead->sale / $lead->cf('Количество показов')->getValue();
+        $invoice->invoice_shows_count = $lead->cf('Количество показов')->getValue() * 1000;
+
+        $invoice->pad_external_id = $transaction->pad_uuid;
+        $invoice->creative_external_id = $transaction->creative_uuid;
+        $invoice->date_start_planned = $date;
+        $invoice->date_end_planned  = $dateEndPlan;
+        $invoice->date_start_actual = $dateStart;
+        $invoice->date_end_actual   = $dateEnd;
+        $invoice->invoice_shows_count = $lead->cf('Количество показов')->getValue();
+        $invoice->shows_count = $lead->cf('Количество показов')->getValue();
+        $invoice->amount = $lead->sale;
+        $invoice->amount_per_event = $invoice->amount / $invoice->shows_count;
+
+        $invoice->create();
+
+        $result = $invoice->add();
 
         if (empty($result->error)) {
 
             $transaction->invoice_uuid = $invoice->uuid;
             $transaction->save();
 
-            $invoice->pad_external_id = $transaction->pad_uuid;
-            $invoice->creative_external_id = $transaction->creative_uuid;
-            $invoice->date_start_planned = $date;
-            $invoice->date_end_planned  = $dateEndPlan;
-            $invoice->date_start_actual = $dateStart;
-            $invoice->date_end_actual   = $dateEnd;
-            $invoice->invoice_shows_count = $lead->cf('Количество показов')->getValue();
-            $invoice->shows_count = $lead->cf('Количество показов')->getValue();
-            $invoice->amount = $lead->sale;
-            $invoice->amount_per_event = $invoice->amount / $invoice->shows_count;
-
-            $result = $invoice->add();
-
-            dd($result);
-
         } else
-            dd(__METHOD__.' : '.$result->error);
+            throw new \Exception(json_encode($result->error));
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Services\Ord;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use Illuminate\Support\Facades\Http;
 use Ramsey\Uuid\Uuid;
@@ -16,31 +17,26 @@ class Media
 
     public function __construct(public OrdService $service) {}
 
+    /**
+     * @throws GuzzleException
+     */
     public function create()
     {
-        $multipart = [
-            [
-                'name'     => 'test',
-                'contents' => 'test'
-            ], [
-                'name'     => 'files',
-                'contents' => $this->media_file,
-                'filename' => $this->file_name,
-                'headers' => ['Content-Type' => 'image/png']
-            ],
-        ];
-
         return (new Client())->request(
             'PUT',
-            $this->service::$baseUrl.'/v1/media/'.$this->uuid.'?description=opisanieeeeeee',
-            array_merge([RequestOptions::MULTIPART => $multipart], ['headers' => $this->service->getHeaders()])
-        )->getBody();
-
-//        return Http::withHeaders($this->service->getHeadersMedia())
-//            ->put($this->service::$baseUrl.'/v1/media/'.$this->uuid.'?description=opisanieeeeeee', [
-////                "description" => $this->description,
-//                "media_file"  => $this->media_file,
-//            ])->object();
+            $this->service::$baseUrl.'/v1/media/'.$this->uuid.'?description='.$this->description, [
+                'headers' => [
+                    'Authorization' => 'Bearer '.$this->service::$token,
+                ],
+                'multipart' => [
+                    [
+                        'name'     => $this->file_name,
+                        'contents' => $this->media_file,
+                        'filename' => $this->file_name,
+                    ],
+                ]
+        ])->getBody()
+          ->getContents();
     }
 
     public function get(string $id): ?object

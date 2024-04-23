@@ -28,7 +28,7 @@ class GetPads extends Command
      */
     public function handle()
     {
-        $pads = (new OrdService('prod'))->pad()->list();
+        $pads = (new OrdService(env('APP_ENV')))->pad()->list();
 
         if (count($pads) !== Pad::query()->count()) {
 

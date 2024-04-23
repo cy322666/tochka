@@ -27,7 +27,7 @@ class GetPersons extends Command
      */
     public function handle()
     {
-        $persons = (new OrdService('prod'))->person()->list();
+        $persons = (new OrdService(env('APP_ENV')))->person()->list();
 
         if (count($persons) !== Person::query()->count()) {
 

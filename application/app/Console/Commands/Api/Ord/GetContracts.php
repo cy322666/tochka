@@ -28,7 +28,7 @@ class GetContracts extends Command
      */
     public function handle()
     {
-        $contracts = (new OrdService('prod'))->contract()->list();
+        $contracts = (new OrdService(env('APP_ENV')))->contract()->list();
 
         if (count($contracts) !== Contract::query()->count()) {
 

@@ -21,7 +21,7 @@ class Pad
     {
         return Http::withHeaders($this->service->getHeaders())
             ->put($this->service::$baseUrl.'/v1/pad/'.$this->uuid, [
-                "create_date" => $this->create_date,
+//                "create_date" => $this->create_date,
                 "person_external_id" => $this->person_external_id,
                 "is_owner" => $this->is_owner,
                 "type" => $this->type,

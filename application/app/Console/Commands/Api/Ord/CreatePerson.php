@@ -41,8 +41,7 @@ class CreatePerson extends Command
                 ->first()
         ))->init();
 
-        $ordApi = new OrdService('prod'); //TODO
-
+        $ordApi = new OrdService(env('APP_ENV'));
         $lead   = $amoApi->service->leads()->find($transaction->lead_id);
         $person = $ordApi->person();
 
