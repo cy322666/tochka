@@ -119,6 +119,10 @@ class CreateCreative extends Command
                     ' erid : '.$transaction->erid,
                     ' market : '.$transaction->marker,
                 ]));
+
+                $lead->cf('Токен')->setValue($transaction->erid);
+                $lead->save();
+
             } else
                 Notes::addOne($lead, 'Произошла ошибка при создании креатива : '.$result ? json_encode($result->error) : 'Неизвестная ошибка');
 
