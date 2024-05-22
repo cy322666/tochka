@@ -10,6 +10,7 @@ use App\Services\amoCRM\Models\Notes;
 use App\Services\Ord\OrdService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\File\File;
@@ -91,7 +92,9 @@ class CreateCreative extends Command
 
         $result = $creative->create();
 
-        if (empty($result->error)) {
+        Log::debug(__METHOD__.' creative response : ', [$result]);
+
+        if (empty($result->error) && $result) {
 
             $transaction->erid   = $result->erid;
             $transaction->marker = $result->marker;
