@@ -3,6 +3,7 @@
 namespace App\Services\Ord;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Ramsey\Uuid\Uuid;
 
 class Creative
@@ -27,22 +28,26 @@ class Creative
 
     public function create()
     {
-        return Http::withHeaders($this->service->getHeaders())
-            ->put($this->service::$baseUrl.'/v1/creative/'.$this->uuid, [
-                "contract_external_id" => $this->contract_external_id,
-                "okveds" => [$this->okveds],
-                "name" => $this->name,
-                "brand" => $this->brand,
+        $body = [
+            "contract_external_id" => $this->contract_external_id,
+            "okveds" => [$this->okveds],
+            "name" => $this->name,
+            "brand" => $this->brand,
 //                "category" => $this->category,
 //                "description" => $this->description,
-                "pay_type" => $this->pay_type,
-                "form" => $this->form,
+            "pay_type" => $this->pay_type,
+            "form" => $this->form,
 //                "targeting" => $this->targeting,
-                "target_urls" => [$this->target_urls],
-                "texts" => $this->texts,
-                "media_external_ids" => $this->media_external_ids,
-                "media_urls" => $this->media_urls,
-            ])->object();
+            "target_urls" => [$this->target_urls],
+            "texts" => $this->texts,
+            "media_external_ids" => $this->media_external_ids,
+            "media_urls" => $this->media_urls,
+        ];
+
+        Log::debug(__METHOD__, $body);
+
+        return Http::withHeaders($this->service->getHeaders())
+            ->put($this->service::$baseUrl.'/v1/creative/'.$this->uuid, $body)->object();
     }
 
     public function get(string $id)
