@@ -50,7 +50,7 @@ class CreateCreative extends Command
 
         //ник блогера - инста
         //название канала - тг
-        $partName = $contact->cf('Ник блогера')->getValue() ?? $contact->cf('Навание канала')->getValue();
+        $partName = $contact->cf('Ник блогера')->getValue() ?? $contact->cf('Название канала')->getValue();
 
         $creativeName = Carbon::now()->format('m.d').'_'.$partName.'_'.$lead->cf('Шаблон креатива')->getValue();
 
