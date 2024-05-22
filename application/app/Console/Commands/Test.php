@@ -41,5 +41,6 @@ class Test extends Command
         Artisan::call('ord:create-contract', ['transaction' => $transaction->id]);
         Artisan::call('ord:create-pad',      ['transaction' => $transaction->id]);
         Artisan::call('ord:create-creative', ['transaction' => $transaction->id]);
+        Artisan::call('ord:create-invoice',  ['transaction' => $transaction->id]);
     }
 }
