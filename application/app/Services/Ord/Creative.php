@@ -41,7 +41,7 @@ class Creative
             "target_urls" => $this->target_urls,
             "texts" => $this->texts,
             "media_external_ids" => $this->media_external_ids,
-            "media_urls" => $this->media_urls,
+//            "media_urls" => $this->media_urls,
         ];
 
         Log::debug(__METHOD__, $body);

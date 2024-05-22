@@ -49,8 +49,6 @@ class CreateCreative extends Command
         $contact = $amoApi->service->contacts()->find($transaction->contact_id);
         $lead    = $amoApi->service->leads()->find($transaction->lead_id);
 
-        //ник блогера - инста
-        //название канала - тг
         $partName = $contact->cf('Ник блогера')->getValue() ?? $contact->cf('Название канала')->getValue();
 
         $creativeName = Carbon::now()->format('m.d').'_'.$partName.'_'.$lead->cf('Шаблон креатива')->getValue();
@@ -62,58 +60,71 @@ class CreateCreative extends Command
             if ($file) break;
         }
 
-        $fileName = $lead->id.'_'.Carbon::now()->format('Y-m-d H:i:s').'.'.$format;
+        try {
 
-        Storage::put($fileName, $file);
+            $fileName = $lead->id.'_'.Carbon::now()->format('Y-m-d H:i:s').'.'.$format;
 
-        $media = $ordApi->media();
-        $media->uuid  = Uuid::uuid4();
-        $media->description = $fileName;
-        $media->file_name = $fileName;
-        $media->media_file = Storage::get($fileName);
+            Storage::put($fileName, $file);
 
-        $result = $media->create();
+            $media = $ordApi->media();
+            $media->uuid  = Uuid::uuid4();
+            $media->description = $fileName;
+            $media->file_name = $fileName;
+            $media->media_file = Storage::get($fileName);
 
-        Log::debug(__METHOD__.' media response : ', [$result]);
+            $result = $media->create();
 
-        $transaction->media_sha = json_decode($result)->sha256;
-        $transaction->media = $media->uuid;
-        $transaction->save();
+            Log::debug(__METHOD__.' media response : '.$result);
 
-        $creative = $ordApi->creative();
-        $creative->uuid  = Uuid::uuid4();
-        $creative->contract_external_id = $transaction->contract_uuid;
-        $creative->name = $creativeName;
-        $creative->brand = 'ООО "Точка знаний"';
-        $creative->pay_type = 'cpm';
-        $creative->form = $lead->cf('Форма креатива')->getValue() ?? 'text_graphic_block';
-        $creative->target_urls = [$lead->cf('Уникальная ссылка')->getValue()  ?? '-'];
-        $creative->texts = [$lead->cf('Текст креатива')->getValue()  ?? '-'];
-        $creative->media_external_ids = [$media->uuid];
-
-        $creative->media_urls = [$lead->cf('Ссылка на медиа')->getValue()];
-
-        $result = $creative->create();
-
-        Log::debug(__METHOD__.' creative response : ', [$result]);
-
-        if (empty($result->error) && $result) {
-
-            $transaction->erid   = $result->erid;
-            $transaction->marker = $result->marker;
-            $transaction->creative_uuid = $creative->uuid;
-            $transaction->status = true;
-            $transaction->media = json_encode([
-                'uuid' => $creative->uuid,
-                'media_urls' => $creative->media_urls
-            ]);
+            $transaction->media_sha = json_decode($result)->sha256;
+            $transaction->media = $media->uuid;
             $transaction->save();
 
-            Notes::addOne($lead, implode("\n", [
-                ' Успешное создание креатива : ',
-                ' erid : '.$transaction->erid,
-                ' market : '.$transaction->marker,
-            ]));
+            Notes::addOne($lead, 'Успешная загрузка медиа : '.$transaction->media);
+
+        } catch (\Throwable $e) {
+
+            Notes::addOne($lead, 'Произошла ошибка при загрузке медиа : '.$e->getMessage());
+
+            return;
+        }
+
+        try {
+            $creative = $ordApi->creative();
+            $creative->uuid  = Uuid::uuid4();
+            $creative->contract_external_id = $transaction->contract_uuid;
+            $creative->name = $creativeName;
+            $creative->brand = 'ООО "Точка знаний"';
+            $creative->pay_type = 'cpm';
+            $creative->form = $lead->cf('Форма креатива')->getValue() ?? 'text_graphic_block';
+            $creative->target_urls = [$lead->cf('Уникальная ссылка')->getValue()  ?? '-'];
+            $creative->texts = [$lead->cf('Текст креатива')->getValue()  ?? '-'];
+            $creative->media_external_ids = [$media->uuid];
+
+            $creative->media_urls = [$lead->cf('Ссылка на медиа')->getValue()];
+
+            $result = $creative->create();
+
+            Log::debug(__METHOD__.' creative response : ', [$result]);
+
+            if (empty($result->error) && $result) {
+
+                $transaction->erid   = $result->erid;
+                $transaction->marker = $result->marker;
+                $transaction->creative_uuid = $creative->uuid;
+                $transaction->save();
+
+                Notes::addOne($lead, implode("\n", [
+                    ' Успешное создание креатива : ',
+                    ' erid : '.$transaction->erid,
+                    ' market : '.$transaction->marker,
+                ]));
+            } else
+                Notes::addOne($lead, 'Произошла ошибка при создании креатива : '.$result ? json_encode($result->error) : 'Неизвестная ошибка');
+
+        } catch (\Throwable $e) {
+
+            Notes::addOne($lead, 'Произошла ошибка при создании креатива : '.$e->getMessage());
         }
     }
 }

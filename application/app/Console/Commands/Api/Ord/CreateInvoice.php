@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\Api\Ord\Contract;
 use App\Models\Api\Ord\Transaction;
 use App\Services\amoCRM\Client;
+use App\Services\amoCRM\Models\Notes;
 use App\Services\Ord\OrdService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -90,7 +91,9 @@ class CreateInvoice extends Command
             $transaction->invoice_uuid = $invoice->uuid;
             $transaction->save();
 
+            Notes::addOne($lead, 'Успешное создание акта : '.$transaction->invoice_uuid);
+
         } else
-            throw new \Exception(json_encode($result->error));
+            Notes::addOne($lead, 'Произошла ошибка при создании акта : '.$result ? json_encode($result->error) : 'Неизвестная ошибка');
     }
 }
