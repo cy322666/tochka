@@ -74,7 +74,10 @@ class CreateCreative extends Command
 
         $result = $media->create();
 
+        Log::debug(__METHOD__.' media response : ', [$result]);
+
         $transaction->media_sha = json_decode($result)->sha256;
+        $transaction->media = $media->uuid;
         $transaction->save();
 
         $creative = $ordApi->creative();
