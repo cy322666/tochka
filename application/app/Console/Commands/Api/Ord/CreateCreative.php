@@ -55,7 +55,7 @@ class CreateCreative extends Command
 
         $creativeName = Carbon::now()->format('m.d').'_'.$partName.'_'.$lead->cf('Шаблон креатива')->getValue();
 
-        foreach (['mp4', 'jpg', 'png'] as $format) {
+        foreach (['mp4', 'jpg', 'png', 'mov'] as $format) {
 
             $file = Leads::getFileByType($amoApi, $account, $lead, [$format]);
 
