@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\Api\Ord\Transaction;
 use App\Services\amoCRM\Client;
 use App\Services\amoCRM\Models\Leads;
+use App\Services\amoCRM\Models\Notes;
 use App\Services\Ord\OrdService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -47,17 +48,26 @@ class CreateCreative extends Command
         $contact = $amoApi->service->contacts()->find($transaction->contact_id);
         $lead    = $amoApi->service->leads()->find($transaction->lead_id);
 
-        $creativeName = Carbon::now()->format('m.d').'_'.$contact->cf('Ник блогера')->getValue().'_'.$lead->cf('Шаблон креатива')->getValue();
+        //ник блогера - инста
+        //название канала - тг
+        $partName = $contact->cf('Ник блогера')->getValue() ?? $contact->cf('Навание канала')->getValue();
 
-        $file = Leads::getFileByType($amoApi, $account, $lead, ['jpg']);
+        $creativeName = Carbon::now()->format('m.d').'_'.$partName.'_'.$lead->cf('Шаблон креатива')->getValue();
 
-        $fileName = $lead->id.'_'.Carbon::now()->format('Y-m-d H:i:s').'.png';
+        foreach (['mp4', 'jpg', 'png'] as $format) {
+
+            $file = Leads::getFileByType($amoApi, $account, $lead, [$format]);
+
+            if ($file) break;
+        }
+
+        $fileName = $lead->id.'_'.Carbon::now()->format('Y-m-d H:i:s').'.'.$format;
 
         Storage::put($fileName, $file);
 
         $media = $ordApi->media();
         $media->uuid  = Uuid::uuid4();
-        $media->description = 'opisanie';//TODO
+        $media->description = $fileName;
         $media->file_name = $fileName;
         $media->media_file = Storage::get($fileName);
 
@@ -73,10 +83,11 @@ class CreateCreative extends Command
         $creative->brand = 'ООО "Точка знаний"';
         $creative->pay_type = 'cpm';
         $creative->form = $lead->cf('Форма креатива')->getValue() ?? 'text_graphic_block';
-        $creative->target_urls = [$lead->cf('Аккаунт')->getValue()  ?? '-'];
+        $creative->target_urls = [$lead->cf('Уникальная ссылка')->getValue()  ?? '-'];
         $creative->texts = [$lead->cf('Текст креатива')->getValue()  ?? '-'];
-        $creative->media_external_ids = [$media->uuid];//$lead->cf('Ссылка на медиа')->getValue()
-        $creative->media_urls = [];
+        $creative->media_external_ids = [$media->uuid];
+
+        $creative->media_urls = [$lead->cf('Ссылка на медиа')->getValue()];
 
         $result = $creative->create();
 
@@ -91,7 +102,12 @@ class CreateCreative extends Command
                 'media_urls' => $creative->media_urls
             ]);
             $transaction->save();
+
+            Notes::addOne($lead, implode("\n", [
+                ' Успешное создание креатива : ',
+                ' erid : '.$transaction->erid,
+                ' market : '.$transaction->marker,
+            ]));
         }
-        //TODO erid + market to lead
     }
 }

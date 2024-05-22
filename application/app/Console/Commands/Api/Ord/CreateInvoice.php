@@ -83,7 +83,7 @@ class CreateInvoice extends Command
 
         $invoice->create();
 
-        $result = $invoice->add();
+        $result = $invoice->add();//TODO куда крепить
 
         if (empty($result->error)) {
 
