@@ -34,6 +34,6 @@ class PlatformController extends Controller
                     'body' => json_encode($request->toArray()),
                 ]);
 
-        Artisan::command('platform:send-order', ['order_id' => $order->id]);
+        Artisan::command('platform:send-order '.$order->id);
     }
 }
