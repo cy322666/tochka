@@ -15,15 +15,13 @@ abstract class Leads
 {
     public static function searchInStatus($contact, $client, array $pipelines = [], int $status_id)
     {
-        $leads = [];
-
         if($contact->leads) {
 
             foreach ($contact->leads->toArray() as $lead) {
 
                 if ($lead['status_id'] == $status_id && in_array($lead['pipeline_id'], $pipelines)) {
 
-                    return $lead['id'];
+                    return $client->service->leads()->find($lead['id']);
                 }
             }
         }
@@ -85,7 +83,7 @@ abstract class Leads
     }
 
     //поиск активной в воронке
-    public static function search($contact, $client, int|array $pipelines = null)
+    public static function searchActive($contact, $client, int|array $pipelines = null)
     {
         return $contact->leads->filter(function($lead) use ($client, $pipelines) {
 

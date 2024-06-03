@@ -187,7 +187,8 @@ return [
             'connection' => 'redis',
             'queue' => [
 //                'default',
-                'salesbot-filter',
+//                'salesbot-filter',
+                'platform-send-order',
             ],
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
