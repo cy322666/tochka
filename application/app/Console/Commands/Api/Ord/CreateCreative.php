@@ -50,7 +50,7 @@ class CreateCreative extends Command
         $lead    = $amoApi->service->leads()->find($transaction->lead_id);
 
         $partName = $contact->cf('Ник блогера')->getValue() ?? $contact->cf('Название канала')->getValue();
-        $partName = $partName.' '.$lead->cf('Аккаунт') ?? '';
+        $partName = $partName.' '.$lead->cf('Аккаунт')->getValue() ?? '';
 
         $creativeName = Carbon::now()->format('m.d').'_'.$partName.'_'.$lead->cf('Шаблон креатива')->getValue();
 
