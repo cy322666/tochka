@@ -98,11 +98,11 @@ class CreateCreative extends Command
             $creative->brand = 'ООО "Точка знаний"';
             $creative->pay_type = 'cpm';
             $creative->form = $lead->cf('Форма креатива')->getValue() ?? 'text_graphic_block';
-            $creative->target_urls = [$lead->cf('Уникальная ссылка')->getValue()  ?? '-'];
+            $creative->target_urls = [$lead->cf('Уникальная ссылка')->getValue() ?? '-'];
             $creative->texts = [$lead->cf('Текст креатива')->getValue()  ?? '-'];
             $creative->media_external_ids = [$media->uuid];
 
-            $creative->media_urls = [$lead->cf('Ссылка на медиа')->getValue()];
+//            $creative->media_urls = [$lead->cf('Ссылка на медиа')->getValue()];
 
             $result = $creative->create();
 
