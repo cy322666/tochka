@@ -90,6 +90,10 @@ class CreateCreative extends Command
             return;
         }
 
+        //ссылка таргет пустая
+        //текстовые данные не полные - смайлики в тексте
+        //поиск уже открытой заявки а не создание новой
+
         try {
             $creative = $ordApi->creative();
             $creative->uuid  = Uuid::uuid4();

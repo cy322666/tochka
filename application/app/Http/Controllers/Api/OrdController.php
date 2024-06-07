@@ -20,6 +20,14 @@ class OrdController extends Controller
         Artisan::call('ord:create-contract', ['transaction' => $transaction->id]);
         Artisan::call('ord:create-pad',      ['transaction' => $transaction->id]);
         Artisan::call('ord:create-creative', ['transaction' => $transaction->id]);
+    }
+
+    public function invoice(Request $request)
+    {
+        $transaction = Transaction::query()
+            ->where('lead_id',  $request->leads['status'][0]['id'])
+            ->first();
+
         Artisan::call('ord:create-invoice',  ['transaction' => $transaction->id]);
     }
 }

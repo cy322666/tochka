@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('ord/hook', [OrdController::class, 'hook']);
 
+Route::post('ord/invoice', [OrdController::class, 'invoice']);
+
 Route::post('msg/hook', [MessagesController::class, 'hook']);
 
 Route::get('platform/orders', [PlatformController::class, 'order']);
