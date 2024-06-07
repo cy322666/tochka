@@ -52,7 +52,7 @@ class CreateCreative extends Command
         $partName = $contact->cf('Ник блогера')->getValue() ?? $contact->cf('Название канала')->getValue();
         $partName = $partName.' '.$lead->cf('Аккаунт')->getValue() ?? '';
 
-        $creativeName = Carbon::now()->format('m.d').'_'.$partName.'_'.$lead->cf('Шаблон креатива')->getValue();
+        $creativeName = Carbon::now()->format('d.m.Y').'_'.$partName;
 
         foreach (['mp4', 'jpg', 'png', 'mov'] as $format) {
 
