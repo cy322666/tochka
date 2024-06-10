@@ -186,18 +186,18 @@ return [
         'supervisor-1' => [
             'connection' => 'redis',
             'queue' => [
-//                'default',
+                'default',
 //                'salesbot-filter',
                 'platform-send-order',
             ],
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
-            'maxProcesses' => 3,
+            'maxProcesses' => 5,
             'maxTime' => 0,
             'maxJobs' => 0,
             'memory' => 512,
             'tries' => 1,
-            'timeout' => 30,
+            'timeout' => 90,
             'nice' => 0,
         ],
     ],
@@ -205,9 +205,9 @@ return [
     'environments' => [
         'production' => [
             'supervisor-1' => [
-                'maxProcesses' => 20,
-                'balanceMaxShift' => 1,
-                'balanceCooldown' => 3,
+                'maxProcesses' => 5,
+//                'balanceMaxShift' => 1,
+//                'balanceCooldown' => 3,
             ],
         ],
 
