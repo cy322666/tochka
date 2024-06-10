@@ -31,6 +31,8 @@ class SendFail extends Command
 
         foreach ($orders as $order) {
 
+            sleep(1);
+
             Artisan::call('platform:send-order', ['order_id' => $order->id]);
         }
     }
