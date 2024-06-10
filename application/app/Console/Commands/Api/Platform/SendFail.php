@@ -33,7 +33,7 @@ class SendFail extends Command
 
         foreach ($orders as $order) {
 
-            sleep(1);
+            sleep(5);
 
             \App\Jobs\Platform\SendOrder::dispatch($order);
         }
