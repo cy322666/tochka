@@ -13,7 +13,7 @@ class SendFail extends Command
      *
      * @var string
      */
-    protected $signature = 'app:send-fail';
+    protected $signature = 'app:send-fail ?{limit}';
 
     /**
      * The console command description.
@@ -27,13 +27,15 @@ class SendFail extends Command
      */
     public function handle()
     {
-        $orders = Order::query()->where('status', false)->get();
+        $orders = Order::query()->where('status', false);
+
+        $orders = $this->argument('limit') ? $orders->limit($this->argument('limit'))->get() : $orders->get();
 
         foreach ($orders as $order) {
 
             sleep(1);
 
-            Artisan::call('platform:send-order', ['order_id' => $order->id]);
+            \App\Jobs\Platform\SendOrder::dispatch($order);
         }
     }
 }
