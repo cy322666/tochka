@@ -192,7 +192,7 @@ return [
             ],
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
-            'maxProcesses' => 15,
+            'maxProcesses' => 3,
             'maxTime' => 0,
             'maxJobs' => 0,
             'memory' => 512,
