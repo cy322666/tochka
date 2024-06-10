@@ -13,6 +13,7 @@ services:
             - redis
             - supervisor
         working_dir: /var/www/html
+        restart: always
     postgresql:
         image: postgres:14.1-alpine
         ports:
