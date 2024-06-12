@@ -47,7 +47,7 @@ class Order extends Model
         INIT_SERVICE_STATUS_ID = 50885656,
 
         PAY_OP_STATUS_ID = 47314576,
-        PAY_SERVICE_STATUS_ID = 142;
+        PAY_SERVICE_STATUS_ID = 50886724;
 
     //чекаем куда отправлять активную сделку
     public function matchStatusByStateActive($lead)
