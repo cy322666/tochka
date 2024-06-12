@@ -72,7 +72,7 @@ class Client
 
         } catch (Exception $e) {
 
-            Log::channel('amo_debug')->warning('fail check auth', [$e->getMessage()]);
+//            Log::channel('amo_debug')->warning('fail check auth', [$e->getMessage()]);
 
             return false;
         }
