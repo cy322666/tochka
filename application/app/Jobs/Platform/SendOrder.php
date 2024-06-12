@@ -55,14 +55,28 @@ class SendOrder implements ShouldQueue
                     'Телефоны' => [$this->order->phone],
                 ]);
 
-            } else
-                $lead = Leads::searchActive($contact, $amoApi, [
-                    Order::OP_PIPELINE_ID,
-                    Order::SERVICE_PIPELINE_ID,
-                    Order::KVAL_PIPELINE_ID,
-                ]);
+            } else {
+                //уже есть синхронизация по сделке, значит пришла рассрочка
+                if ($this->order->lead_id) {
 
-            //нет активной сделки
+                    $lead = $amoApi->service->leads()->find($this->order->lead_id);
+                    //если не получили ее по апи, то склеена или удалена
+                    if (!$lead) {
+
+                        $this->order->lead_id = null;
+                        $this->order->save();
+
+                        //ишем активные сделки
+                        $lead = Leads::searchActive($contact, $amoApi, [
+                            Order::OP_PIPELINE_ID,
+                            Order::SERVICE_PIPELINE_ID,
+                            Order::KVAL_PIPELINE_ID,
+                        ]);
+                    }
+                }
+            }
+
+            //нет активной сделки и не рассрочка
             if (empty($lead) || !$lead) {
                 //ищем успешные сделки в оп. в сервисе не ищем, тк вывод по оп однозначный
                 // - если есть -> сервис
