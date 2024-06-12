@@ -61,25 +61,21 @@ abstract class Leads
         }
     }
 
-    public static function searchByStatus($contact, $client, int $pipeline_id, int $status_id) : ?array
+    public static function searchByStatus($contact, $client, int $pipeline_id, int $status_id)
     {
-        $leads = [];
-
         if($contact->leads) {
 
-            foreach ($contact->leads as $lead) {
+            return $contact->leads->filter(function($lead) use ($client, $pipeline_id, $status_id) {
 
-                if ($lead->status_id == $status_id && $lead->pipeline_id == $pipeline_id) {
+                $leads = [];
 
-                    $lead = $client->service
-                        ->leads()
-                        ->find($lead->id);
+                if ($lead->status_id == $status_id && $lead->pipeline_id == $pipeline_id)
 
-                    $leads = array_merge($leads, $lead);
-                }
-            }
+                    $leads = array_merge($leads, [$lead]);
+
+                return $leads;
+            });
         }
-        return $leads;
     }
 
     //поиск активной в воронке
