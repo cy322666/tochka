@@ -93,7 +93,8 @@ class Order extends Model
             return self::INIT_SERVICE_STATUS_ID;
 
         if ($this->status_order == 'Оплачен' ||
-            $this->status_order == 'Частично оплачен')
+            $this->status_order == 'Частично оплачен' ||
+            $this->status_order == 'Завершен')
 
             return self::PAY_SERVICE_STATUS_ID;
 
@@ -111,7 +112,8 @@ class Order extends Model
             return self::INIT_OP_STATUS_ID;
 
         if ($this->status_order == 'Оплачен' ||
-            $this->status_order == 'Частично оплачен')
+            $this->status_order == 'Частично оплачен' ||
+            $this->status_order == 'Завершен')
 
             return self::PAY_OP_STATUS_ID;
 
@@ -124,7 +126,7 @@ class Order extends Model
     {
         Log::debug(__METHOD__.' создание сделки');
 
-        $lead = Leads::create($contact, [
+        $lead = Leads::createPrepare($contact, [
             'responsible_user_id' => 5998951,//TODO
             'status_id' => $statusId,
             'pipeline_id' => $pipelineId,
