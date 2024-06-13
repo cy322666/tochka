@@ -19,6 +19,7 @@ class Creative
     public string $form;
     public string $targeting;
     public array $target_urls;
+    public string $url;
     public array $texts;
     public array $media_external_ids;
     public array $media_urls;
@@ -38,7 +39,8 @@ class Creative
             "pay_type" => $this->pay_type,
             "form" => $this->form,
 //                "targeting" => $this->targeting,
-            "target_urls" => $this->target_urls,
+//            "url" => $this->target_urls,
+            "url" => $this->url,
             "texts" => $this->texts,
             "media_external_ids" => $this->media_external_ids,
 //            "media_urls" => $this->media_urls,
