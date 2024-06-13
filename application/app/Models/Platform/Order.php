@@ -28,6 +28,7 @@ class Order extends Model
         'contact_id',
         'pipeline_id',
         'status_id',
+        'staff',
 
         'utm_source',
         'utm_medium',

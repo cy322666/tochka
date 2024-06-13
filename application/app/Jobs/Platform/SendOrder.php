@@ -113,6 +113,7 @@ class SendOrder implements ShouldQueue
         $this->order->status_id = $lead->status_id;
         $this->order->pipeline_id = $lead->pipeline_id;
         $this->order->contact_id = $contact->id;
+        $this->order->staff = $lead->cf('Оплата менеджера ОП')->getValue();
         $this->order->status = true;
         $this->order->save();
     }
