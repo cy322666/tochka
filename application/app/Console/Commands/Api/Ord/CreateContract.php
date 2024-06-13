@@ -87,21 +87,11 @@ class CreateContract extends Command
                 ]);
         }
 
-        //для заявки
-        $contract = $ordApi->contract();
+        $contract = Contract::query()
+            ->where('serial', $lead->cf('Номер заявки')->getValue())
+            ->first();
 
-        $contract->uuid = Uuid::uuid4();
-        $contract->type = 'additional';
-        $contract->client_external_id = $searchBaseContract->client_external_id;
-        $contract->contractor_external_id = $searchBaseContract->contractor_external_id;
-        $contract->date = Carbon::parse($lead->cf('Дата заявки')->getValue())->format('Y-m-d');
-        $contract->serial = $lead->cf('Номер заявки')->getValue();
-        $contract->subject_type = 'distribution';
-        $contract->parent_contract_external_id = $searchBaseContract->uuid;
-
-        $result = $contract->create();
-
-        if (empty($result->error)) {
+        if ($contract) {
 
             $transaction->contract_uuid = $contract->uuid;
             $transaction->contract_serial = $contract->serial;
@@ -109,11 +99,41 @@ class CreateContract extends Command
             $transaction->save();
 
             Notes::addOne($lead, implode("\n", [
-                ' Успешное создание заявки : ',
+                ' Успешная синхронизация заявки : ',
                 ' Договор : '.$searchBaseContract->uuid.' , '.$searchBaseContract->serial,
                 ' Заявка : '.$contract->uuid.' , '.$contract->serial,
             ]));
-        } else
-            Notes::addOne($lead, 'Произошла ошибка при создании заявки : '.json_encode($result->error));
+
+        } else {
+
+            //для заявки
+            $contract = $ordApi->contract();
+
+            $contract->uuid = Uuid::uuid4();
+            $contract->type = 'additional';
+            $contract->client_external_id = $searchBaseContract->client_external_id;
+            $contract->contractor_external_id = $searchBaseContract->contractor_external_id;
+            $contract->date = Carbon::parse($lead->cf('Дата заявки')->getValue())->format('Y-m-d');
+            $contract->serial = $lead->cf('Номер заявки')->getValue();
+            $contract->subject_type = 'distribution';
+            $contract->parent_contract_external_id = $searchBaseContract->uuid;
+
+            $result = $contract->create();
+
+            if (empty($result->error)) {
+
+                $transaction->contract_uuid = $contract->uuid;
+                $transaction->contract_serial = $contract->serial;
+                $transaction->parent_contract_external_id = $searchBaseContract->uuid;
+                $transaction->save();
+
+                Notes::addOne($lead, implode("\n", [
+                    ' Успешное создание заявки : ',
+                    ' Договор : '.$searchBaseContract->uuid.' , '.$searchBaseContract->serial,
+                    ' Заявка : '.$contract->uuid.' , '.$contract->serial,
+                ]));
+            } else
+                Notes::addOne($lead, 'Произошла ошибка при создании заявки : '.json_encode($result->error));
+        }
     }
 }
