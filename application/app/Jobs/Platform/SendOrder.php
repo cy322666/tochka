@@ -72,6 +72,7 @@ class SendOrder implements ShouldQueue
                         Order::OP_PIPELINE_ID,
                         Order::SERVICE_PIPELINE_ID,
                         Order::KVAL_PIPELINE_ID,
+                        Order::DOP_PIPELINE_ID,
                     ]);
                 }
             }

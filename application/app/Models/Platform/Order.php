@@ -43,12 +43,15 @@ class Order extends Model
         OP_PIPELINE_ID = 3738346,
         SERVICE_PIPELINE_ID = 4870069,
         KVAL_PIPELINE_ID = 6552278,
+        DOP_PIPELINE_ID = 5674156,
 
         INIT_OP_STATUS_ID = 50954683,
         INIT_SERVICE_STATUS_ID = 50885656,
+        INIT_DOP_STATUS_ID = 49931782,
 
         PAY_OP_STATUS_ID = 47314576,
-        PAY_SERVICE_STATUS_ID = 50886724;
+        PAY_SERVICE_STATUS_ID = 50886724,
+        PAY_DOP_STATUS_ID = 142;
 
     //чекаем куда отправлять активную сделку
     public function matchStatusByStateActive($lead)
@@ -63,10 +66,13 @@ class Order extends Model
                 self::OP_PIPELINE_ID, self::KVAL_PIPELINE_ID => self::INIT_OP_STATUS_ID,
                 //активная в сервисе и новый заказ -> инициализация
                 self::SERVICE_PIPELINE_ID => self::INIT_SERVICE_STATUS_ID,
+                //активная в допродажах и новый заказ -> счет выставлен
+                self::DOP_PIPELINE_ID => self::INIT_DOP_STATUS_ID,
             };
 
         if ($this->status_order == 'Оплачен' ||
-            $this->status_order == 'Частично оплачен')
+            $this->status_order == 'Частично оплачен' ||
+            $this->status_order == 'Завершен')
 
             return match ($lead->pipeline_id) {
                 //активная в оп и оплаченный заказ -> инициализация
@@ -74,13 +80,15 @@ class Order extends Model
                 self::OP_PIPELINE_ID, self::KVAL_PIPELINE_ID => self::PAY_OP_STATUS_ID,
                 //активная в сервисе и оплаченный заказ -> инициализация
                 self::SERVICE_PIPELINE_ID => self::PAY_SERVICE_STATUS_ID,
+                //активная в допродажах и оплаченный заказ -> ур
+                self::DOP_PIPELINE_ID => self::PAY_DOP_STATUS_ID,
             };
 
         if ($this->status_order == 'Отменен')
 
             return match ($lead->pipeline_id) {
                 //активная и отмена -> закрываем в нереализ
-                self::OP_PIPELINE_ID, self::KVAL_PIPELINE_ID, self::SERVICE_PIPELINE_ID => 143
+                self::OP_PIPELINE_ID, self::KVAL_PIPELINE_ID, self::SERVICE_PIPELINE_ID, self::DOP_PIPELINE_ID => 143
             };
     }
 
