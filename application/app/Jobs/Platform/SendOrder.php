@@ -112,6 +112,8 @@ class SendOrder implements ShouldQueue
 
         Notes::addOne($lead, NoteHelper::createNoteOrder($this->order));
 
+        $lead = $amoApi->service->leads()->find($lead->id);
+
         $this->order->lead_id = $lead->id;
         $this->order->status_id = $lead->status_id;
         $this->order->pipeline_id = $lead->pipeline_id;
