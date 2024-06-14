@@ -31,6 +31,7 @@ class PlatformController extends Controller
                     'utm_content' => $request->utm_content,
                     'utm_term' => $request->utm_term,
                     'utm_campaign' => $request->utm_campaign,
+                    'status' => false,
 
                     'body' => json_encode($request->toArray()),
                 ]);
