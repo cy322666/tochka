@@ -3,6 +3,7 @@
 namespace App\Console\Commands\Api\Ord;
 
 use App\Models\Account;
+use App\Models\Api\Ord\Text;
 use App\Models\Api\Ord\Transaction;
 use App\Services\amoCRM\Client;
 use App\Services\amoCRM\Models\Leads;
@@ -90,10 +91,6 @@ class CreateCreative extends Command
             return;
         }
 
-        //ссылка таргет пустая
-        //текстовые данные не полные - смайлики в тексте
-        //поиск уже открытой заявки а не создание новой
-
         try {
             $creative = $ordApi->creative();
             $creative->uuid  = Uuid::uuid4();
@@ -103,10 +100,8 @@ class CreateCreative extends Command
             $creative->pay_type = 'cpm';
             $creative->form = $lead->cf('Форма креатива')->getValue() ?? 'text_graphic_block';
             $creative->url = $lead->cf('Уникальная ссылка')->getValue() ?? '-';
-            $creative->texts = [$lead->cf('Текст креатива')->getValue()  ?? '-'];
+            $creative->texts = [Text::query()->where('key', $lead->cf('Шаблон креатива')->getValue())->first()->text];
             $creative->media_external_ids = [$media->uuid];
-
-//            $creative->media_urls = [$lead->cf('Ссылка на медиа')->getValue()];
 
             $result = $creative->create();
 
