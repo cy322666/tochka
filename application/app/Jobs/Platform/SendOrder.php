@@ -80,32 +80,29 @@ class SendOrder implements ShouldQueue
 
         //нет активной сделки и не рассрочка
         if (empty($lead) || !$lead) {
-            //ищем успешные сделки в оп. в сервисе не ищем, тк вывод по оп однозначный
-            // - если есть -> сервис
-            // - если нет -> оп
+            //значит повторник -> создание в сервисе в одном из 2 этапов
+            //в любом, потому что склейка должна быть
             $lead = Leads::searchInStatus($contact, $amoApi, [
-                Order::OP_PIPELINE_ID,
+                Order::SERVICE_PIPELINE_ID,
             ], 142);
 
-            //если есть в оп успешная сделка
-            if ($lead) {
-                //значит повторник -> создание в сервисе в одном из 2 этапов
-                //в любом, потому что склейка должна быть
-                //тут мало условий для сервиса (инит или активный)
-                //сделка там скорее всего будет уже в ур, поискать
-
+            //если нет в сервисе успешной сделки
+            if (!$lead) {
+                //ищем успешные сделки в оп
+                // - если есть -> сервис
+                // - если нет -> оп
                 $lead = Leads::searchInStatus($contact, $amoApi, [
-                    Order::SERVICE_PIPELINE_ID,
+                    Order::OP_PIPELINE_ID,
                 ], 142);
 
                 //обновляем сделку в ур сервисе
                 if ($lead)
-                    $lead = $this->order->updateLead($lead);
-                else
                     $lead = $this->order->createLead($contact, $this->order->matchStatusBySuccess(), Order::SERVICE_PIPELINE_ID);
+                else
+                    $lead = $this->order->createLead($contact, $this->order->matchStatusBySuccess(), Order::OP_PIPELINE_ID);
             //если нет, то просто оп
             } else
-                $lead = $this->order->createLead($contact, $this->order->matchStatusNoSuccess(), Order::OP_PIPELINE_ID);//тут много условий возможно и не инит
+                $lead = $this->order->updateLead($lead);
         } else
             //есть активная обновляем ранее полученным статусом и данными
             $this->order->updateLead($lead, $this->order->matchStatusByStateActive($lead));
