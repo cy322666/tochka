@@ -91,13 +91,10 @@ class SendOrder implements ShouldQueue
                 //ищем успешные сделки в оп
                 // - если есть -> сервис
                 // - если нет -> оп
-                $lead = Leads::searchInStatus($contact, $amoApi, [
-                    Order::OP_PIPELINE_ID,
-                ], 142);
+                $lead = Leads::searchInPipeline($contact, $amoApi, Order::OP_PIPELINE_ID);
 
-                //обновляем сделку в ур сервисе
                 if ($lead)
-                    $lead = $this->order->createLead($contact, $this->order->matchStatusBySuccess(), Order::SERVICE_PIPELINE_ID);
+                    $lead = $this->order->updateLead($contact, $this->order->matchStatusBySuccess());
                 else
                     $lead = $this->order->createLead($contact, $this->order->matchStatusBySuccess(), Order::OP_PIPELINE_ID);
             //если нет, то просто оп
