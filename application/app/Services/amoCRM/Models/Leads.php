@@ -15,7 +15,7 @@ abstract class Leads
 {
     public static function searchInStatus($contact, $client, array $pipelines = [], int $status_id)
     {
-        if($contact->leads) {
+//        if($contact->leads) {
 
             foreach ($contact->leads->toArray() as $lead) {
 
@@ -24,12 +24,12 @@ abstract class Leads
                     return $client->service->leads()->find($lead['id']);
                 }
             }
-        }
+//        }
     }
 
     public static function searchInPipeline($contact, $client, int $pipeline_id)
     {
-        if($contact->leads) {
+//        if($contact->leads) {
 
             foreach ($contact->leads->toArray() as $lead) {
 
@@ -37,7 +37,7 @@ abstract class Leads
 
                     return $client->service->leads()->find($lead['id']);
             }
-        }
+//        }
     }
 
     public static function getFileLinkByType($amoApi, $account, $lead, $types = ['pdf'])
