@@ -27,6 +27,19 @@ abstract class Leads
         }
     }
 
+    public static function searchInPipeline($contact, $client, int $pipeline_id)
+    {
+        if($contact->leads) {
+
+            foreach ($contact->leads->toArray() as $lead) {
+
+                if ($lead['pipeline_id'] == $pipeline_id)
+
+                    return $client->service->leads()->find($lead['id']);
+            }
+        }
+    }
+
     public static function getFileLinkByType($amoApi, $account, $lead, $types = ['pdf'])
     {
         $files  = $amoApi->service->ajax()->get('/api/v4/leads/'.$lead->id.'/files', []);
@@ -42,7 +55,6 @@ abstract class Leads
                 return $result->_links->download->href;
         }
     }
-
 
     public static function getFileByType($amoApi, $account, $lead, $types = ['pdf'])
     {
