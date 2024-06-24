@@ -142,11 +142,16 @@ class Order extends Model
             'sale' => $this->cost_money,
         ], $this->name);
 
-        $lead->cf('GetCourse. Номер заказа')->setValue($this->order_id);
-        $lead->cf('GetCourse. Оплачено')->setValue($this->payed_money);
-        $lead->cf('GetCourse. Состав заказа')->setValue($this->positions);
-        $lead->cf('GetCourse. Осталось оплатить')->setValue($this->left_cost_money);
-        $lead->cf('GetCourse. Статус заказа')->setValue($this->status_order);
+        try {
+            $lead->cf('GetCourse. Номер заказа')->setValue($this->order_id);
+            $lead->cf('GetCourse. Оплачено')->setValue($this->payed_money);
+            $lead->cf('GetCourse. Состав заказа')->setValue($this->positions);
+            $lead->cf('GetCourse. Осталось оплатить')->setValue($this->left_cost_money);
+            $lead->cf('GetCourse. Статус заказа')->setValue($this->status_order);
+
+        } catch (\Throwable $e) {
+            Log::alert(__METHOD__, [$e->getMessage()]);
+        }
 
         $lead->sale = $this->cost_money;
 
@@ -161,11 +166,15 @@ class Order extends Model
     {
         Log::debug(__METHOD__.' Обновление сделки');
 
-        $lead->cf('GetCourse. Номер заказа')->setValue($this->order_id);
-        $lead->cf('GetCourse. Оплачено')->setValue($this->payed_money);
-        $lead->cf('GetCourse. Состав заказа')->setValue($this->positions);
-        $lead->cf('GetCourse. Осталось оплатить')->setValue($this->left_cost_money);
-        $lead->cf('GetCourse. Статус заказа')->setValue($this->status_order);
+        try {
+            $lead->cf('GetCourse. Номер заказа')->setValue($this->order_id);
+            $lead->cf('GetCourse. Оплачено')->setValue($this->payed_money);
+            $lead->cf('GetCourse. Состав заказа')->setValue($this->positions);
+            $lead->cf('GetCourse. Осталось оплатить')->setValue($this->left_cost_money);
+            $lead->cf('GetCourse. Статус заказа')->setValue($this->status_order);
+        } catch (\Throwable $e) {
+            Log::alert(__METHOD__, [$e->getMessage()]);
+        }
 
         $lead->sale = $this->cost_money;
 
