@@ -82,24 +82,28 @@ class SendOrder implements ShouldQueue
         if (empty($lead) || !$lead) {
             //значит повторник -> создание в сервисе в одном из 2 этапов
             //в любом, потому что склейка должна быть
-            $lead = Leads::searchInStatus($contact, $amoApi, [
-                Order::SERVICE_PIPELINE_ID,
-            ], 142);
+            $lead = Leads::searchInStatus($contact, $amoApi, [Order::SERVICE_PIPELINE_ID], 142);
 
             //если нет в сервисе успешной сделки
             if (!$lead) {
-                //ищем успешные сделки в оп
-                // - если есть -> сервис
-                // - если нет -> оп
+                //ищем любые сделки в оп
+                // - если есть -> обновляем
+                // - если нет -> создаем
                 $lead = Leads::searchInPipeline($contact, $amoApi, Order::OP_PIPELINE_ID);
-
-                if ($lead)
-                    $lead = $this->order->updateLead($lead, $this->order->matchStatusBySuccess());
-                else
-                    $lead = $this->order->createLead($contact, $this->order->matchStatusBySuccess(), Order::OP_PIPELINE_ID);
+                //если в оп есть сделка (любая)
+                if ($lead) {
+                    //активную - обновляем
+                    if ($lead->status_id !== 142)
+                        $lead = $this->order->updateLead($lead, $this->order->matchStatusNoSuccess());
+                    else
+                        //закрытая - создаем в сервисе новую
+                        $lead = $this->order->createLead($contact, $this->order->matchStatusBySuccess(), Order::SERVICE_PIPELINE_ID);
+                } else
+                    //в оп вообще нет сделок
+                    $lead = $this->order->createLead($contact, $this->order->matchStatusNoSuccess(), Order::OP_PIPELINE_ID);
             //если нет, то просто оп
             } else
-                $lead = $this->order->updateLead($lead);
+                $lead = $this->order->updateLead($lead, $this->order->matchStatusNoSuccess());
         } else
             //есть активная обновляем ранее полученным статусом и данными
             $this->order->updateLead($lead, $this->order->matchStatusByStateActive($lead));
