@@ -66,47 +66,46 @@ class SendOrder implements ShouldQueue
 
                     $this->order->lead_id = null;
                     $this->order->save();
-
-                    //ишем активные сделки
-                    $lead = Leads::searchActive($contact, $amoApi, [
-                        Order::OP_PIPELINE_ID,
-                        Order::SERVICE_PIPELINE_ID,
-                        Order::KVAL_PIPELINE_ID,
-                        Order::DOP_PIPELINE_ID,
-                    ]);
                 }
             }
         }
 
-        //нет активной сделки и не рассрочка
+        //не рассрочка
         if (empty($lead) || !$lead) {
-            //значит повторник -> создание в сервисе в одном из 2 этапов
-            //в любом, потому что склейка должна быть
-            $lead = Leads::searchInStatus($contact, $amoApi, [Order::SERVICE_PIPELINE_ID], 142);
+            //ишем активные сделки в рабочих воронках
+            $lead = Leads::searchActive($contact, $amoApi, [
+                Order::OP_PIPELINE_ID,
+                Order::DOP_PIPELINE_ID,
+                Order::SERVICE_PIPELINE_ID,
+            ]);
 
-            //если нет в сервисе успешной сделки
-            if (!$lead) {
-                //ищем любые сделки в оп
-                // - если есть -> обновляем
-                // - если нет -> создаем
-                $lead = Leads::searchInPipeline($contact, $amoApi, Order::OP_PIPELINE_ID);
-                //если в оп есть сделка (любая)
-                if ($lead) {
-                    //активную - обновляем
-                    if ($lead->status_id !== 142)
-                        $lead = $this->order->updateLead($lead, $this->order->matchStatusNoSuccess());
+            if ($lead) {
+                //есть активная сделка, двигаем ее в ур или инициализацию
+                $lead->status_id = $this->order->matchStatusByStateActive($lead);
+                $lead->save();
+            } else {
+                //ищем успешные в рабочих воронках
+                $lead = Leads::searchInStatus($contact, $amoApi, [
+                    Order::OP_PIPELINE_ID,
+                    Order::DOP_PIPELINE_ID,
+                    Order::SERVICE_PIPELINE_ID,
+                ], 142);
+
+                if ($lead->pipeline_id == Order::OP_PIPELINE_ID ||
+                    $lead->pipeline_id == Order::DOP_PIPELINE_ID) {
+                    //если нашли, то это повторник -> сервис
+                    $lead = Leads::searchInPipeline($contact, $amoApi, Order::SERVICE_PIPELINE_ID);
+                    //ищем успешную для обновления или создаем там новую
+                    if ($lead)
+                        $lead = $this->order->updateLead($lead, $this->order->matchStatusBySuccess());
                     else
-                        //закрытая - создаем в сервисе новую
-                        $lead = $this->order->createLead($contact, $this->order->matchStatusBySuccess(), Order::SERVICE_PIPELINE_ID);
-                } else
-                    //в оп вообще нет сделок
-                    $lead = $this->order->createLead($contact, $this->order->matchStatusNoSuccess(), Order::OP_PIPELINE_ID);
-            //если нет, то просто оп
-            } else
-                $lead = $this->order->updateLead($lead, $this->order->matchStatusNoSuccess());
-        } else
-            //есть активная обновляем ранее полученным статусом и данными
-            $this->order->updateLead($lead, $this->order->matchStatusByStateActive($lead));
+                        $lead = $this->order->createLead($contact, $this->order->matchStatusBySuccess(), Order::SERVICE_PIPELINE_ID
+                        );
+                } elseif ($lead->pipeline_id == Order::SERVICE_PIPELINE_ID)
+                    //есть успешная в сервисе
+                    $lead = $this->order->updateLead($lead, $this->order->matchStatusBySuccess());
+            }
+        }
 
         Notes::addOne($lead, NoteHelper::createNoteOrder($this->order));
 

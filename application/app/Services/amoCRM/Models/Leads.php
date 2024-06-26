@@ -113,7 +113,8 @@ abstract class Leads
                 } else
                     return true;
             }
-        })->sortBy('created_at', 'DESC')?->first();
+        })?->first();
+//            ->sortBy('created_at', 'DESC')
     }
 
     public static function searchAll(Contact $contact, $client, int|array $pipelines = null)
