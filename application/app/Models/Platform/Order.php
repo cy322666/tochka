@@ -56,7 +56,7 @@ class Order extends Model
     //чекаем куда отправлять активную сделку
     public function matchStatusByStateActive($lead)
     {
-        Log::debug(__METHOD__.' есть активная');
+        Log::debug(__METHOD__.' '.$this->id.' есть активная');
 
         if ($this->status_order == 'Новый')
 
@@ -95,7 +95,7 @@ class Order extends Model
     //какой этап у новой сделки если есть успешная
     public function matchStatusBySuccess()
     {
-        Log::debug(__METHOD__.' есть успешная/ые');
+        Log::debug(__METHOD__.' '.$this->id.' есть успешная/ые');
 
         if ($this->status_order == 'Новый')
 
@@ -114,7 +114,7 @@ class Order extends Model
 
     public function matchStatusNoSuccess()
     {
-        Log::debug(__METHOD__.' нет активных создание в ОП');
+        Log::debug(__METHOD__.' '.$this->id.' нет активных создание в ОП');
 
         if ($this->status_order == 'Новый')
 
@@ -133,7 +133,7 @@ class Order extends Model
 
     public function createLead($contact, int $statusId, int $pipelineId)
     {
-        Log::debug(__METHOD__.' создание сделки');
+        Log::debug(__METHOD__.' '.$this->id.' создание сделки');
 
         $lead = Leads::createPrepare($contact, [
             'responsible_user_id' => 5998951,//TODO
@@ -150,7 +150,7 @@ class Order extends Model
             $lead->cf('GetCourse. Статус заказа')->setValue($this->status_order);
 
         } catch (\Throwable $e) {
-            Log::alert(__METHOD__, [$e->getMessage()]);
+            Log::alert(__METHOD__.' '.$this->id, [$e->getMessage()]);
         }
 
         $lead->sale = $this->cost_money;
@@ -164,7 +164,7 @@ class Order extends Model
 
     public function updateLead($lead, $statusId = null)
     {
-        Log::debug(__METHOD__.' Обновление сделки');
+        Log::debug(__METHOD__.' '.$this->id.' Обновление сделки');
 
         try {
             $lead->cf('GetCourse. Номер заказа')->setValue($this->order_id);
