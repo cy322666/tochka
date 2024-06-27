@@ -104,7 +104,7 @@ class SendOrder implements ShouldQueue
                     //есть успешная в сервисе
                     $lead = $this->order->updateLead($lead, $this->order->matchStatusBySuccess());
                 else
-                    $lead = $this->order->createLead($contact, $this->order->matchStatusNoSuccess(), Order::OP_PIPELINE_ID
+                    $lead = $this->order->createLead($contact, $this->order->matchStatusNoSuccess(), Order::OP_PIPELINE_ID);
             }
         }
 
