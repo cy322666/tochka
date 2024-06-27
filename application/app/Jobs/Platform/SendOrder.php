@@ -91,7 +91,7 @@ class SendOrder implements ShouldQueue
                     Order::SERVICE_PIPELINE_ID,
                 ], 142);
 
-                if ($lead->pipeline_id == Order::OP_PIPELINE_ID) {
+                if ($lead && $lead->pipeline_id == Order::OP_PIPELINE_ID) {
 //                    $lead->pipeline_id == Order::DOP_PIPELINE_ID) {
                     //если нашли, то это повторник -> сервис
                     $lead = Leads::searchInPipeline($contact, $amoApi, Order::SERVICE_PIPELINE_ID);
@@ -99,11 +99,12 @@ class SendOrder implements ShouldQueue
                     if ($lead)
                         $lead = $this->order->updateLead($lead, $this->order->matchStatusBySuccess());
                     else
-                        $lead = $this->order->createLead($contact, $this->order->matchStatusBySuccess(), Order::SERVICE_PIPELINE_ID
-                        );
-                } elseif ($lead->pipeline_id == Order::SERVICE_PIPELINE_ID)
+                        $lead = $this->order->createLead($contact, $this->order->matchStatusBySuccess(), Order::SERVICE_PIPELINE_ID);
+                } elseif ($lead && $lead->pipeline_id == Order::SERVICE_PIPELINE_ID)
                     //есть успешная в сервисе
                     $lead = $this->order->updateLead($lead, $this->order->matchStatusBySuccess());
+                else
+                    $lead = $this->order->createLead($contact, $this->order->matchStatusNoSuccess(), Order::OP_PIPELINE_ID
             }
         }
 

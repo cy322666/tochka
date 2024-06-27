@@ -67,7 +67,7 @@ class Order extends Model
                 //активная в сервисе и новый заказ -> инициализация
                 self::SERVICE_PIPELINE_ID => self::INIT_SERVICE_STATUS_ID,
                 //активная в допродажах и новый заказ -> счет выставлен
-                self::DOP_PIPELINE_ID => self::INIT_DOP_STATUS_ID,
+//                self::DOP_PIPELINE_ID => self::INIT_DOP_STATUS_ID,
             };
 
         if ($this->status_order == 'Оплачен' ||
@@ -81,7 +81,7 @@ class Order extends Model
                 //активная в сервисе и оплаченный заказ -> инициализация
                 self::SERVICE_PIPELINE_ID => self::PAY_SERVICE_STATUS_ID,
                 //активная в допродажах и оплаченный заказ -> ур
-                self::DOP_PIPELINE_ID => self::PAY_DOP_STATUS_ID,
+//                self::DOP_PIPELINE_ID => self::PAY_DOP_STATUS_ID,
             };
 
         if ($this->status_order == 'Отменен')
