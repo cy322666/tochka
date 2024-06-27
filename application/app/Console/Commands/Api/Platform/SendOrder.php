@@ -26,6 +26,6 @@ class SendOrder extends Command
      */
     public function handle()
     {
-        \App\Jobs\Platform\SendOrder::dispatch(\App\Models\Platform\Order::query()->find($this->argument('order_id')));
+        \App\Jobs\Platform\SendOrder::dispatch(\App\Models\Platform\Order::query()->find($this->argument('order_id')))->delay(3);
     }
 }
