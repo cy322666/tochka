@@ -106,6 +106,10 @@ class SendOrder implements ShouldQueue
                 else
                     $lead = $this->order->createLead($contact, $this->order->matchStatusNoSuccess(), Order::OP_PIPELINE_ID);
             }
+        } elseif($lead != 142) {
+
+            $lead->status_id = $this->order->matchStatusByStateActive($lead);
+            $lead->save();
         }
 
         Notes::addOne($lead, NoteHelper::createNoteOrder($this->order));
