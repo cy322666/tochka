@@ -87,19 +87,20 @@ class SendOrder implements ShouldQueue
                 //ищем успешные в рабочих воронках
                 $lead = Leads::searchInStatus($contact, $amoApi, [
                     Order::OP_PIPELINE_ID,
-//                    Order::DOP_PIPELINE_ID,
+                    Order::DOP_PIPELINE_ID,
                     Order::SERVICE_PIPELINE_ID,
                 ], 142);
 
-                if ($lead && $lead->pipeline_id == Order::OP_PIPELINE_ID) {
-//                    $lead->pipeline_id == Order::DOP_PIPELINE_ID) {
-                    //если нашли, то это повторник -> сервис
-                    $lead = Leads::searchInPipeline($contact, $amoApi, Order::SERVICE_PIPELINE_ID);
-                    //ищем успешную для обновления или создаем там новую
-                    if ($lead)
-                        $lead = $this->order->updateLead($lead, $this->order->matchStatusBySuccess());
-                    else
-                        $lead = $this->order->createLead($contact, $this->order->matchStatusBySuccess(), Order::SERVICE_PIPELINE_ID);
+                if ($lead &&
+                   ($lead->pipeline_id == Order::OP_PIPELINE_ID || $lead->pipeline_id == Order::DOP_PIPELINE_ID)) {
+                        //если нашли, то это повторник -> сервис
+                        $lead = Leads::searchInPipeline($contact, $amoApi, Order::SERVICE_PIPELINE_ID);
+                        //ищем успешную для обновления или создаем там новую
+                        if ($lead && $lead->pipeline_id == Order::OP_PIPELINE_ID)
+                            $lead = $this->order->updateLead($lead, $this->order->matchStatusBySuccess());
+                        else
+                            $lead = $this->order->createLead($contact, $this->order->matchStatusBySuccess(), Order::SERVICE_PIPELINE_ID);
+
                 } elseif ($lead && $lead->pipeline_id == Order::SERVICE_PIPELINE_ID)
                     //есть успешная в сервисе
                     $lead = $this->order->updateLead($lead, $this->order->matchStatusBySuccess());
