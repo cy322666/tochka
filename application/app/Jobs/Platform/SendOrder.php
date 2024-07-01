@@ -75,7 +75,7 @@ class SendOrder implements ShouldQueue
             //ишем активные сделки в рабочих воронках
             $lead = Leads::searchActive($contact, $amoApi, [
                 Order::OP_PIPELINE_ID,
-//                Order::DOP_PIPELINE_ID,
+                Order::DOP_PIPELINE_ID,
                 Order::SERVICE_PIPELINE_ID,
             ]);
 
@@ -92,15 +92,17 @@ class SendOrder implements ShouldQueue
                 ], 142);
 
                 if ($lead &&
-                   ($lead->pipeline_id == Order::OP_PIPELINE_ID || $lead->pipeline_id == Order::DOP_PIPELINE_ID)) {
+                   ($lead->pipeline_id == Order::OP_PIPELINE_ID ||
+                    $lead->pipeline_id == Order::DOP_PIPELINE_ID)) {
                         //если нашли, то это повторник -> сервис
                         $lead = Leads::searchInPipeline($contact, $amoApi, Order::SERVICE_PIPELINE_ID);
                         //ищем успешную для обновления или создаем там новую
-                        if ($lead && $lead->pipeline_id == Order::OP_PIPELINE_ID)
+                        if ($lead)
                             $lead = $this->order->updateLead($lead, $this->order->matchStatusBySuccess());
                         else
                             $lead = $this->order->createLead($contact, $this->order->matchStatusBySuccess(), Order::SERVICE_PIPELINE_ID);
 
+                //нет успешной в продажных, смотрим в сервисе
                 } elseif ($lead && $lead->pipeline_id == Order::SERVICE_PIPELINE_ID)
                     //есть успешная в сервисе
                     $lead = $this->order->updateLead($lead, $this->order->matchStatusBySuccess());
