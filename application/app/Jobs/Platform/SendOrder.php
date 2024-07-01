@@ -44,7 +44,7 @@ class SendOrder implements ShouldQueue
         if ($this->order->status) return;
 
         $contact = Contacts::search([
-            'Телефон' => Contacts::clearPhone($this->order->phone),
+            'Телефоны' => [Contacts::clearPhone($this->order->phone)],
             'Почта' => $this->order->email ?? null,
         ], $amoApi);
 
