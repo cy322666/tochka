@@ -37,6 +37,7 @@ class Order extends Model
         'utm_campaign',
 
         'body',
+        'is_first',
     ];
 
     const

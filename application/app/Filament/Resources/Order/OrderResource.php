@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Order;
 use App\Filament\Resources\Order\OrderResource\Pages\ListOrder;
 use App\Models\Docs\Doc;
 use App\Models\Platform\Order;
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -46,6 +47,11 @@ class OrderResource extends Resource
                     ->label('Создан')
                     ->dateTime()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Обновлен')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggledHiddenByDefault(false),
                 Tables\Columns\TextColumn::make('lead_id')
                     ->url(fn(Order $order) => 'https://matematikandrei.amocrm.ru/leads/detail/'.$order->lead_id)
                     ->label('Сделка')
@@ -59,7 +65,55 @@ class OrderResource extends Resource
                     ->label('Менеджер'),
             ])
             ->filters([
+
+                Tables\Filters\Filter::make('today')
+                    ->label('За сегодня')
+                    ->query(fn (Builder $query): Builder => $query
+                        ->whereDate('updated_at', '>', Carbon::now()->format('Y-m-d').' 00:00:00')
+                        ->whereDate('updated_at', '<', Carbon::now()->addDay()->format('Y-m-d').' 00:00:00')
+                        ->where('status_order', 'Частично оплачен')
+                        ->orWhere('status_order', 'Завершен')),
+
+                Tables\Filters\Filter::make('yesterday')
+                    ->label('За вчера')
+                    ->query(fn (Builder $query): Builder => $query
+                        ->whereDate('updated_at', '>', Carbon::now()->subDay()->format('Y-m-d').' 00:00:00')
+                        ->whereDate('updated_at', '<', Carbon::now()->format('Y-m-d').' 00:00:00')
+                        ->where('status_order', 'Частично оплачен')
+                        ->orWhere('status_order', 'Завершен')),
+
+                Tables\Filters\SelectFilter::make('no_staff')
+                    ->label('Самооплаты')
+                    ->options([
+                        'yes' => 'Да',
+                        'no'  => 'Нет',
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when(
+                        $data,
+                        fn (Builder $query, $data): Builder => $query->where('staff', '!=', null),
+                    )
+                        ->where('status_order', 'Частично оплачен')
+                        ->orWhere('status_order', 'Завершен')),
+
+                Tables\Filters\SelectFilter::make('first')
+                    ->label('Первичные')
+                    ->options([
+                        'yes' => 'Да',
+                        'no'  => 'Нет',
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when(
+                            $data,
+                            fn (Builder $query, $data): Builder => $query->where('staff', '!=', null),//TODO считать сразу в бд
+
+                            //$order->status_id == Order::INIT_OP_STATUS_ID || $order->status_id == Order::PAY_OP_STATUS_ID || $order->pipeline_id == Order::OP_PIPELINE_ID ? 'Первичная' : 'Повторная')
+                        )
+                        ->where('status_order', 'Частично оплачен')
+                        ->orWhere('status_order', 'Завершен')),
+
                 Tables\Filters\Filter::make('created_at')
+                    ->label('За период')
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
                             ->label('Созданы от'),
