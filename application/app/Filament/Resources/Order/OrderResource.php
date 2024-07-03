@@ -63,6 +63,8 @@ class OrderResource extends Resource
                     ->label('Тип оплаты'),
                 Tables\Columns\TextColumn::make('staff')
                     ->label('Менеджер'),
+                Tables\Columns\TextColumn::make('is_first')
+                    ->label('Первичный'),
             ])
             ->filters([
 
