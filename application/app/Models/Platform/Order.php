@@ -38,6 +38,7 @@ class Order extends Model
 
         'body',
         'is_first',
+        'is_payed',
     ];
 
     const

@@ -39,8 +39,6 @@ class OrderResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('order_id')
-                    ->label('#'),
                 Tables\Columns\TextColumn::make('email')
                     ->label('Почта'),
                 Tables\Columns\TextColumn::make('created_at')
@@ -56,11 +54,15 @@ class OrderResource extends Resource
                     ->url(fn(Order $order) => 'https://matematikandrei.amocrm.ru/leads/detail/'.$order->lead_id)
                     ->label('Сделка')
                     ->openUrlInNewTab(),
-                Tables\Columns\TextColumn::make('pipeline_id')
-                    ->state(fn(Order $order) => $order->status_id == Order::INIT_OP_STATUS_ID || $order->status_id == Order::PAY_OP_STATUS_ID || $order->pipeline_id == Order::OP_PIPELINE_ID ? 'Первичная' : 'Повторная')
-                    ->label('Тип продажи'),
+                Tables\Columns\TextColumn::make('contact_id')
+                    ->url(fn(Order $order) => 'https://matematikandrei.amocrm.ru/contacts/detail/'.$order->contact_id)
+                    ->label('Контакт')
+                    ->openUrlInNewTab(),
+                Tables\Columns\TextColumn::make('cost_money')
+                    ->label('Стоимость')
+                    ->summarize(Tables\Columns\Summarizers\Summarizer::make()),
                 Tables\Columns\TextColumn::make('status_order')
-                    ->label('Тип оплаты'),
+                    ->label('Статус'),
                 Tables\Columns\TextColumn::make('staff')
                     ->label('Менеджер'),
                 Tables\Columns\TextColumn::make('is_first')
@@ -71,16 +73,16 @@ class OrderResource extends Resource
                 Tables\Filters\Filter::make('today')
                     ->label('За сегодня')
                     ->query(fn (Builder $query): Builder => $query
-                        ->whereDate('updated_at', '>', Carbon::now()->format('Y-m-d').' 00:00:00')
-                        ->whereDate('updated_at', '<', Carbon::now()->addDay()->format('Y-m-d').' 00:00:00')
+                        ->whereDate('updated_at', '>', Carbon::now())
+                        ->whereDate('updated_at', '<', Carbon::now()->addDay())
                         ->where('status_order', 'Частично оплачен')
                         ->orWhere('status_order', 'Завершен')),
 
                 Tables\Filters\Filter::make('yesterday')
                     ->label('За вчера')
                     ->query(fn (Builder $query): Builder => $query
-                        ->whereDate('updated_at', '>', Carbon::now()->subDay()->format('Y-m-d').' 00:00:00')
-                        ->whereDate('updated_at', '<', Carbon::now()->format('Y-m-d').' 00:00:00')
+                        ->whereDate('updated_at', '>', Carbon::now()->subDay())
+                        ->whereDate('updated_at', '<', Carbon::now())
                         ->where('status_order', 'Частично оплачен')
                         ->orWhere('status_order', 'Завершен')),
 
