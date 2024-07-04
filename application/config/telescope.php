@@ -143,12 +143,12 @@ return [
 
         Watchers\ExceptionWatcher::class => env('TELESCOPE_EXCEPTION_WATCHER', true),
 
-//        Watchers\GateWatcher::class => [
-//            'enabled' => env('TELESCOPE_GATE_WATCHER', true),
-//            'ignore_abilities' => [],
-//            'ignore_packages' => true,
-//            'ignore_paths' => [],
-//        ],
+        Watchers\GateWatcher::class => [
+            'enabled' => env('TELESCOPE_GATE_WATCHER', true),
+            'ignore_abilities' => [],
+            'ignore_packages' => true,
+            'ignore_paths' => [],
+        ],
 
         Watchers\JobWatcher::class => env('TELESCOPE_JOB_WATCHER', true),
 
