@@ -61,12 +61,14 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('cost_money')
                     ->label('Стоимость')
                     ->summarize(Tables\Columns\Summarizers\Summarizer::make()),
-                Tables\Columns\TextColumn::make('status_order')
-                    ->label('Статус'),
+//                Tables\Columns\TextColumn::make('status_order')
+//                    ->label('Статус'),
                 Tables\Columns\TextColumn::make('staff')
                     ->label('Менеджер'),
                 Tables\Columns\TextColumn::make('is_first')
                     ->label('Первичный'),
+                Tables\Columns\TextColumn::make('is_payed')
+                    ->label('Оплачен'),
             ])
             ->filters([
 
