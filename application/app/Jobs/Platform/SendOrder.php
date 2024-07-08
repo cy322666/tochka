@@ -51,11 +51,6 @@ class SendOrder implements ShouldQueue
         if (!$contact) {
             $contact = Contacts::create($amoApi, $this->order->name);
 
-            $contact = Contacts::update($contact, [
-                'Почта' => $this->order->email,
-                'Телефоны' => [$this->order->phone],
-            ]);
-
         } else {
             //уже есть синхронизация по сделке, значит пришла рассрочка
             if ($this->order->lead_id) {
@@ -69,6 +64,11 @@ class SendOrder implements ShouldQueue
                 }
             }
         }
+
+        $contact = Contacts::update($contact, [
+            'Почта' => $this->order->email,
+            'Телефоны' => [$this->order->phone],
+        ]);
 
         //не рассрочка
         if (empty($lead) || !$lead) {
