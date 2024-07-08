@@ -111,7 +111,7 @@ class SendOrder implements ShouldQueue
             }
         } elseif($lead->status_id != 142) {
 
-            $lead->status_id = $this->order->matchStatusByStateActive($lead);
+            $lead = $this->order->updateLead($lead, $this->order->matchStatusByStateActive($lead));
             $lead->save();
         }
 
