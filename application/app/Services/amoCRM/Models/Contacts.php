@@ -108,7 +108,7 @@ abstract class Contacts extends Client
 
     public static function clearPhone(?string $phone): ?string
     {
-        return $phone ? substr(str_replace([',', '(', ')', '-', '+', ' '],'', $phone), -10) : null;
+        return $phone ? str_replace([',', '(', ')', '-', '+', ' '],'', $phone) : null;
     }
 
     public static function create(Client $amoapi, $name = 'Неизвестно')
