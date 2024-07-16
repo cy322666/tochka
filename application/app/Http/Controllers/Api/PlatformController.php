@@ -13,6 +13,8 @@ class PlatformController extends Controller
 {
     public function order(Request $request)
     {
+        Log::info(__METHOD__, $request->toArray());
+
         $order = Order::query()
             ->updateOrCreate(
                 ['order_id' => $request->order_id],
