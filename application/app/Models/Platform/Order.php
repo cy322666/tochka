@@ -6,6 +6,7 @@ use App\Services\amoCRM\Models\Leads;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use Ufee\Amo\Models\Contact;
 
 class Order extends Model
 {
@@ -190,5 +191,13 @@ class Order extends Model
         $lead->save();
 
         return $lead;
+    }
+
+    public static function isFirst(Contact $contact, $amoApi) : bool
+    {
+        if (Leads::searchInPipeline($contact, $amoApi, Order::SERVICE_PIPELINE_ID) ||
+            Leads::searchInPipeline($contact, $amoApi, Order::DOP_PIPELINE_ID))
+
+            return true;
     }
 }

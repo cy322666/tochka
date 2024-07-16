@@ -327,4 +327,9 @@ abstract class Leads
             return null;
         }
     }
+
+    public static function getCountLeads()
+    {
+
+    }
 }
