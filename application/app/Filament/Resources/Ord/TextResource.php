@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Ord;
 
 use App\Filament\Resources\Ord\TextResource\Pages;
 use App\Filament\Resources\Ord\TextResource\RelationManagers;
+use App\Models\Api\Ord\Text;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class TextResource extends Resource
 {
-    protected static ?string $model = \App\Models\Api\Ord\Text::class;
+    protected static ?string $model = Text::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
