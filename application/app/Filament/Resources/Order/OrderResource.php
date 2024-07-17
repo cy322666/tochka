@@ -31,6 +31,8 @@ class OrderResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('order_id')
+                    ->label('#'),
                 Tables\Columns\TextColumn::make('email')
                     ->label('Почта'),
                 Tables\Columns\TextColumn::make('created_at')
