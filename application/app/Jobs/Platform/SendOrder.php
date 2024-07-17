@@ -15,6 +15,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class SendOrder implements ShouldQueue
 {
@@ -52,12 +53,16 @@ class SendOrder implements ShouldQueue
             $contact = Contacts::create($amoApi, $this->order->name);
 
         } else {
-            //уже есть синхронизация по сделке, значит пришла рассрочка
+
             if ($this->order->lead_id) {
+
+                Log::debug(__METHOD__.' '.__LINE__.' '.$this->order->id.' Уже есть синхронизация');
 
                 $lead = $amoApi->service->leads()->find($this->order->lead_id);
                 //если не получили ее по апи, то склеена или удалена
                 if (!$lead) {
+
+                    Log::debug(__METHOD__.' '.__LINE__.' '.$this->order->id.' Синхронизированная сделка не получена');
 
                     $this->order->lead_id = null;
                     $this->order->save();
@@ -73,6 +78,8 @@ class SendOrder implements ShouldQueue
         //не рассрочка
         if (empty($lead) || !$lead) {
             //ишем активные сделки в рабочих воронках
+            Log::debug(__METHOD__.' '.__LINE__.' '.$this->order->id.' Нет привязанной сделки, ищем активные в трех воронках');
+
             $lead = Leads::searchActive($contact, $amoApi, [
                 Order::OP_PIPELINE_ID,
                 Order::DOP_PIPELINE_ID,
@@ -81,10 +88,14 @@ class SendOrder implements ShouldQueue
 
             if ($lead) {
                 //есть активная сделка, двигаем ее в ур или инициализацию
+                Log::debug(__METHOD__.' '.__LINE__.' '.$this->order->id.' Есть активная сделка');
+
                 $lead->status_id = $this->order->matchStatusByStateActive($lead);
                 $lead->save();
             } else {
                 //ищем успешные в рабочих воронках
+                Log::debug(__METHOD__.' '.__LINE__.' '.$this->order->id.' Ищем успешные в трех рабочих воронках');
+
                 $lead = Leads::searchInStatus($contact, $amoApi, [
                     Order::OP_PIPELINE_ID,
                     Order::DOP_PIPELINE_ID,
@@ -95,21 +106,34 @@ class SendOrder implements ShouldQueue
                    ($lead->pipeline_id == Order::OP_PIPELINE_ID ||
                     $lead->pipeline_id == Order::DOP_PIPELINE_ID)) {
                         //если нашли, то это повторник -> сервис
+                        Log::debug(__METHOD__.' '.__LINE__.' '.$this->order->id.' Есть сделка в продажных воронках -> повторник');
+
                         $lead = Leads::searchInPipeline($contact, $amoApi, Order::SERVICE_PIPELINE_ID);
                         //ищем успешную для обновления или создаем там новую
-                        if ($lead)
-                            $lead = $this->order->updateLead($lead, $this->order->matchStatusBySuccess());
-                        else
-                            $lead = $this->order->createLead($contact, $this->order->matchStatusBySuccess(), Order::SERVICE_PIPELINE_ID);
+                        if ($lead) {
+                            Log::debug(__METHOD__.' '.__LINE__.' '.$this->order->id.' Есть сделка в Сервисе - обновляем ее');
 
+                            $lead = $this->order->updateLead($lead, $this->order->matchStatusBySuccess());
+                        } else {
+                            Log::debug(__METHOD__.' '.__LINE__.' '.$this->order->id.' Нет сделки в Севрисе - создаем в нем');
+
+                            $lead = $this->order->createLead($contact, $this->order->matchStatusBySuccess(), Order::SERVICE_PIPELINE_ID);
+                        }
                 //нет успешной в продажных, смотрим в сервисе
-                } elseif ($lead && $lead->pipeline_id == Order::SERVICE_PIPELINE_ID)
+                } elseif ($lead && $lead->pipeline_id == Order::SERVICE_PIPELINE_ID) {
                     //есть успешная в сервисе
+                    Log::debug(__METHOD__.' '.__LINE__.' '.$this->order->id.' Есть сделка в Сервисе - обновляем ее');
+
                     $lead = $this->order->updateLead($lead, $this->order->matchStatusBySuccess());
-                else
+                } else {
+                    Log::debug(__METHOD__.' '.__LINE__.' '.$this->order->id.' Нет сделки в Севрисе - создаем в нем');
+
                     $lead = $this->order->createLead($contact, $this->order->matchStatusNoSuccess(), Order::OP_PIPELINE_ID);
+                }
             }
         } elseif($lead->status_id != 142) {
+
+            Log::debug(__METHOD__.' '.__LINE__.' '.$this->order->id.' Привязанная сделка не в успещном этапе -> обновляем ее');
 
             $lead = $this->order->updateLead($lead, $this->order->matchStatusByStateActive($lead));
             $lead->save();
