@@ -88,7 +88,7 @@ class SendOrder implements ShouldQueue
 
             if ($lead) {
                 //есть активная сделка, двигаем ее в ур или инициализацию
-                Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Есть активная сделка');
+                Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Есть активная сделка, обновляем ее');
 
                 $lead->status_id = $this->order->matchStatusByStateActive($lead);
                 $lead->save();
@@ -133,11 +133,13 @@ class SendOrder implements ShouldQueue
             }
         } elseif($lead->status_id != 142) {
 
-            Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Привязанная сделка не в успещном этапе -> обновляем ее');
+            Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Привязанная сделка не в успешном этапе -> обновляем ее');
 
             $lead = $this->order->updateLead($lead, $this->order->matchStatusByStateActive($lead));
             $lead->save();
         }
+
+        Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Конец логики, обновляем бд');
 
         Notes::addOne($lead, NoteHelper::createNoteOrder($this->order));
 
