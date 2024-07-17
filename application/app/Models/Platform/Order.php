@@ -198,8 +198,8 @@ class Order extends Model
         if (Leads::searchInPipeline($contact, $amoApi, Order::SERVICE_PIPELINE_ID) ||
             Leads::searchInPipeline($contact, $amoApi, Order::DOP_PIPELINE_ID))
 
-            return true;
-        else
             return false;
+        else
+            return true;
     }
 }
