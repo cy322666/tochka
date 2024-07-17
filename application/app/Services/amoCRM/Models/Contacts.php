@@ -56,52 +56,33 @@ abstract class Contacts extends Client
 
     public static function update(Contact $contact, $arrayFields = [])
     {
-        if(key_exists('Телефоны', $arrayFields)) {
-
+        if (key_exists('Телефоны', $arrayFields)) {
             foreach ($arrayFields['Телефоны'] as $phone) {
-
                 $contact->cf('Телефон')->setValue($phone);
             }
         }
 
-        if(key_exists('Почта', $arrayFields)) {
-
+        if (key_exists('Почта', $arrayFields)) {
             $contact->cf('Email')->setValue($arrayFields['Почта']);
         }
 
-        if(key_exists('Ответственный', $arrayFields)) {
-
+        if (key_exists('Ответственный', $arrayFields)) {
             $contact->responsible_user_id = $arrayFields['Ответственный'];
         }
 
-        if(key_exists('Имя', $arrayFields)) {
-
+        if (key_exists('Имя', $arrayFields)) {
             $contact->name = $arrayFields['Имя'];
         }
 
-        if(key_exists('cf', $arrayFields)) {
-
+        if (key_exists('cf', $arrayFields)) {
             foreach ($arrayFields['cf'] as $fieldsName => $fieldValue) {
-
-                if(strpos($fieldsName, 'Дата') == true) {
-
+                if (strpos($fieldsName, 'Дата') == true) {
                     $contact->cf($fieldsName)->setData($fieldValue);
                 }
                 $contact->cf($fieldsName)->setValue($fieldValue);
             }
         }
-
-        try {
-            $contact->save();
-
-        } catch (\Throwable $e) {
-
-            Log::channel('amo_debug')->warning([
-            'message' => $e->getMessage(),
-            'trace'   => $e->getTraceAsString(),
-            'account' => ['no']
-        ]);
-}
+        $contact->save();
 
         return $contact;
     }
