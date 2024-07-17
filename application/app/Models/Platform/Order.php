@@ -199,5 +199,7 @@ class Order extends Model
             Leads::searchInPipeline($contact, $amoApi, Order::DOP_PIPELINE_ID))
 
             return true;
+        else
+            return false;
     }
 }
