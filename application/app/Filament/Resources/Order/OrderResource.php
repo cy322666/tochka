@@ -150,8 +150,6 @@ class OrderResource extends Resource
                         ->accessSelectedRecords()
                         ->action(function (Order $record, Collection $selectedRecords) {
 
-                            sleep(2);
-
                             $selectedRecords->each(
                                 fn (Order $selectedRecord) => Artisan::call('platform:send-order', ['order_id' => $selectedRecord->id])
                             );
