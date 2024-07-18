@@ -21,7 +21,7 @@ class SendOrder implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $tries = 1;
+    public int $tries = 3;
     public int $timeout = 90;
 
     public function __construct(public \App\Models\Platform\Order $order) {
