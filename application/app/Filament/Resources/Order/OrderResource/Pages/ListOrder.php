@@ -21,6 +21,7 @@ class ListOrder extends ListRecords
 
                 $orders = Order::query()
                     ->where('status', false)
+                    ->where('lead_id',null)
                     ->whereDate('updated_at', '>', Carbon::now()->subDays(3)->format('Y-m-d'))
                     ->get();
 
