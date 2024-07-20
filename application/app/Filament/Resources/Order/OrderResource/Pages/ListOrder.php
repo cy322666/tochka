@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Order\OrderResource\Pages;
 use App\Filament\Resources\Order\OrderResource;
 use App\Filament\Widgets\StatsOrdersOverview;
 use App\Models\Platform\Order;
+use Carbon\Carbon;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -20,6 +21,7 @@ class ListOrder extends ListRecords
 
                 $orders = Order::query()
                     ->where('status', false)
+                    ->whereDate('updated_at', '>', Carbon::now()->subDays(3)->format('Y-m-d'))
                     ->get();
 
                 foreach ($orders as $order) {
