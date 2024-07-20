@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Order\OrderResource\Pages;
 
 use App\Filament\Resources\Order\OrderResource;
 use App\Filament\Widgets\StatsOrdersOverview;
+use App\Models\Platform\Order;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -15,7 +16,17 @@ class ListOrder extends ListRecords
     {
         return [
             Actions\Action::make('Экспорт')->disabled(),
-            Actions\Action::make('Догрузить'),
+            Actions\Action::make('Догрузить')->action(function () {
+
+                $orders = Order::query()
+                    ->where('status', false)
+                    ->get();
+
+                foreach ($orders as $order) {
+
+                    \App\Jobs\Platform\SendOrder::dispatch($order);
+                }
+            }),
         ];
     }
 
