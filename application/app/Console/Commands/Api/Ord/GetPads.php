@@ -6,6 +6,7 @@ use App\Models\Api\Ord\Contract;
 use App\Models\Api\Ord\Pad;
 use App\Services\Ord\OrdService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class GetPads extends Command
 {
@@ -50,7 +51,7 @@ class GetPads extends Command
                         ]);
                     }
                 } catch (\Throwable $e) {
-                    Log($e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine());
+                    Log::error($e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine());
                 }
             }
         }
