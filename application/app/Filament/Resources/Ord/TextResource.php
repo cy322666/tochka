@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Ord;
 
 use App\Filament\Resources\Ord\TextResource\Pages;
-use App\Filament\Resources\Ord\TextResource\RelationManagers;
 use App\Models\Api\Ord\Text;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -28,8 +27,9 @@ class TextResource extends Resource
                 Forms\Components\Textarea::make('text')
                     ->label('Текст')
                     ->autosize(),
-                Forms\Components\FileUpload::make('media')
+                Forms\Components\BaseFileUpload::make('media')
                     ->label('Медиа')
+                    ->visibility('public')
             ]);
     }
 
