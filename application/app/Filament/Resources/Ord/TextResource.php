@@ -27,9 +27,8 @@ class TextResource extends Resource
                 Forms\Components\Textarea::make('text')
                     ->label('Текст')
                     ->autosize(),
-                Forms\Components\BaseFileUpload::make('media')
+                Forms\Components\FileUpload::make('media')
                     ->label('Медиа')
-                    ->visibility('public')
             ]);
     }
 
