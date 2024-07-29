@@ -62,6 +62,13 @@ class CreateCreative extends Command
             if ($file) break;
         }
 
+        if (empty($file)) {
+
+            Notes::addOne($lead, 'Креатив не загружен, нет медиа в сделке');
+
+            return;
+        }
+
         try {
 
             $fileName = $lead->id.'_'.Carbon::now()->format('Y-m-d H:i:s').'.'.$format;
