@@ -27,7 +27,9 @@ class TextResource extends Resource
                     ->label('Название шаблона'),
                 Forms\Components\Textarea::make('text')
                     ->label('Текст')
-                    ->autosize()
+                    ->autosize(),
+                Forms\Components\FileUpload::make('media')
+                    ->label('Медиа')
             ]);
     }
 

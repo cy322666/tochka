@@ -14,5 +14,6 @@ class Text extends Model
     protected $fillable = [
         'text',
         'key',
+        'media',
     ];
 }
