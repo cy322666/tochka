@@ -55,12 +55,11 @@ class CreateCreative extends Command
 
         $creativeName = Carbon::now()->format('d.m.Y').'_'.$partName;
 
-        foreach (['mp4', 'jpg', 'png', 'mov'] as $format) {
+        $template = Text::query()
+            ->where('key', $lead->cf('Шаблон')->getValue())
+            ->findOrFail();
 
-            $file = Leads::getFileByType($amoApi, $account, $lead, [$format]);
-
-            if ($file) break;
-        }
+        $file = Storage::drive('public')->get($template->media);
 
         if (empty($file)) {
 
