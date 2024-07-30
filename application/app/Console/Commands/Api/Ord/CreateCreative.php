@@ -92,7 +92,7 @@ class CreateCreative extends Command
 
         } catch (\Throwable $e) {
 
-            Notes::addOne($lead, 'Произошла ошибка при загрузке медиа : '.$e->getMessage());
+            Notes::addOne($lead, 'Произошла ошибка при загрузке медиа : '.$e->getFile().' '.$e->getLine().' '.$e->getMessage());
 
             return;
         }
@@ -134,7 +134,7 @@ class CreateCreative extends Command
 
         } catch (\Throwable $e) {
 
-            Notes::addOne($lead, 'Произошла ошибка при создании креатива : '.$e->getMessage());
+            Notes::addOne($lead, 'Произошла ошибка при создании креатива : '.$e->getFile().' '.$e->getLine().' '.$e->getMessage());
         }
     }
 }
