@@ -57,7 +57,7 @@ class CreateCreative extends Command
 
         $template = Text::query()
             ->where('key', $lead->cf('Шаблон креатива')->getValue())
-            ->findOrFail();
+            ->firstOrFail();
 
         $file = Storage::drive('public')->get($template->media);
 
