@@ -56,7 +56,7 @@ class CreateCreative extends Command
         $creativeName = Carbon::now()->format('d.m.Y').'_'.$partName;
 
         $template = Text::query()
-            ->where('key', $lead->cf('Шаблон')->getValue())
+            ->where('key', $lead->cf('Шаблон креатива')->getValue())
             ->findOrFail();
 
         $file = Storage::drive('public')->get($template->media);
