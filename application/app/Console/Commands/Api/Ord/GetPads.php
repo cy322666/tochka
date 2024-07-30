@@ -44,7 +44,7 @@ class GetPads extends Command
                         Pad::query()->updateOrCreate(['uuid' => $pad], [
                             "create_date" => $detail->create_date,
                             "person_external_id" => $detail->person_external_id,
-                            "is_owner" => $detail->is_owner,
+//                            "is_owner" => $detail->is_owner,
                             "type" => $detail->type,
                             "name" => $detail->name,
                             "url" => $detail->url,
