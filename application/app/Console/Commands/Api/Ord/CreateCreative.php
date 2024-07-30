@@ -131,9 +131,12 @@ class CreateCreative extends Command
                 $lead->cf('Токен')->setValue($transaction->erid);
                 $lead->save();
 
-            } else
-                Notes::addOne($lead, 'Произошла ошибка при создании креатива : '.$result ? json_encode($result->error) : 'Неизвестная ошибка');
+            } else {
 
+                Notes::addOne($lead, 'Произошла ошибка при создании креатива');
+
+                Log::error(__METHOD__, $result ? [$result->error] : ['Неизвестная ошибка']);
+            }
         } catch (\Throwable $e) {
 
             Notes::addOne($lead, 'Произошла ошибка при создании креатива : '.$e->getFile().' '.$e->getLine().' '.$e->getMessage());
