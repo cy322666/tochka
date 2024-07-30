@@ -59,6 +59,8 @@ class CreateCreative extends Command
             ->where('key', $lead->cf('Шаблон креатива')->getValue())
             ->firstOrFail();
 
+        $format = explode('.', $template->media)[1];
+
         $file = Storage::drive('public')->get($template->media);
 
         if (empty($file)) {
