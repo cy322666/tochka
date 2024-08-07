@@ -58,13 +58,14 @@ class CreatePad extends Command
             ->where('uuid', $transaction->person_uuid)
             ->first();
 
+        $name = $lead->pipeline_id == self::IG_PIPELINE_ID ? $contact->cf('Ник блогера')->getValue() : $contact->cf('Название канала')->getValue();
+
         $searchPad = Pad::query()
             ->where('person_external_id', $searchPerson->uuid)
+            ->where('name', $name)
             ->first();
 
         if (!$searchPad) {
-
-            $name = $lead->pipeline_id == self::IG_PIPELINE_ID ? $contact->cf('Ник блогера')->getValue() : $contact->cf('Название канала')->getValue();
 
             $pad->uuid = Uuid::uuid4();
             $pad->person_external_id = $transaction->person_uuid;
