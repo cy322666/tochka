@@ -57,7 +57,10 @@ class CreateCreative extends Command
 
         $template = Text::query()
             ->where('key', $lead->cf('Шаблон креатива')->getValue())
-            ->firstOrFail();
+            ->first();
+
+        if (!$template)
+            Notes::addOne($lead, 'Такой шаблон не найден');
 
         $format = explode('.', $template->media)[1];
 
