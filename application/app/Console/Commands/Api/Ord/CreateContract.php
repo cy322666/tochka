@@ -51,7 +51,7 @@ class CreateContract extends Command
         $lead = $amoApi->service->leads()->find($transaction->lead_id);
 
         $searchBaseContract = Contract::query()
-            ->where('contractor_external_id', $transaction->person_uuid)
+            ->where('serial', $lead->company->cf('Номер договора')->getValue())
             ->where('type', 'service')
             ->first();
 
