@@ -53,7 +53,7 @@ class CreateCreative extends Command
         $partName = $contact->cf('Ник блогера')->getValue() ? $contact->cf('Ник блогера')->getValue() : $contact->cf('Название канала')->getValue();
         $partName = $lead->cf('Аккаунт')->getValue() ? $partName.' '.$lead->cf('Аккаунт')->getValue() : '';
 
-        $creativeName = Carbon::now()->format('d.m.Y').'_'.$partName;
+        $creativeName = Carbon::parse($lead->cf('Дата рекламы план')->getValue())->format('d.m.Y').'_'.$partName;
 
         $template = Text::query()
             ->where('key', $lead->cf('Шаблон креатива')->getValue())
