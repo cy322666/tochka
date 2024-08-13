@@ -70,7 +70,7 @@ class CreateContract extends Command
 
             if (!empty($result->error)) {
 
-                Notes::addOne($lead, 'Произошла ошибка при создании заявки : '.json_encode($result->error));
+                Notes::addOne($lead, 'Произошла ошибка при создании договора : '.json_encode($result->error));
 
                 return;
             }
@@ -85,10 +85,15 @@ class CreateContract extends Command
                     'serial' => $contract->serial,
                     'subject_type' => $contract->subject_type,
                 ]);
+
+            Notes::addOne($lead, implode("\n", [
+                ' Успешное создание договора : '.$searchBaseContract->uuid.' , '.$searchBaseContract->serial,
+            ]));
         }
 
         $contract = Contract::query()
             ->where('serial', $lead->cf('Номер заявки')->getValue())
+            ->where('type', '!=', 'service')
             ->first();
 
         if ($contract) {
@@ -106,7 +111,7 @@ class CreateContract extends Command
 
         } else {
 
-            //для заявки
+            //для новой заявки
             $contract = $ordApi->contract();
 
             $contract->uuid = Uuid::uuid4();

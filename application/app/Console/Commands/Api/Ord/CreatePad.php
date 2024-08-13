@@ -52,8 +52,6 @@ class CreatePad extends Command
         $lead = $amoApi->service->leads()->find($transaction->lead_id);
         $contact = $lead->contact;
 
-        $pad  = $ordApi->pad();
-
         $searchPerson = Person::query()
             ->where('uuid', $transaction->person_uuid)
             ->first();
@@ -67,12 +65,13 @@ class CreatePad extends Command
 
         if (!$searchPad) {
 
+            $pad = $ordApi->pad();
             $pad->uuid = Uuid::uuid4();
             $pad->person_external_id = $transaction->person_uuid;
             $pad->is_owner = false;
             $pad->type = 'web';
             $pad->name = $name;
-            $pad->url = $lead->cf('Ссылка для площадки')->getValue() ?? 'https://google.com';
+            $pad->url = $lead->pipeline_id == self::IG_PIPELINE_ID ? $contact->cf('Ссылка на канал')->getValue() : $contact->cf('PR аккаунт')->getValue();
             $pad->create();
 
             if (empty($result->error)) {
