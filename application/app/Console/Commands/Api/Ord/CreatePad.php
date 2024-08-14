@@ -71,7 +71,7 @@ class CreatePad extends Command
             $pad->is_owner = false;
             $pad->type = 'web';
             $pad->name = $name;
-            $pad->url = $lead->pipeline_id == self::IG_PIPELINE_ID ? $contact->cf('Ссылка на канал')->getValue() : $contact->cf('PR аккаунт')->getValue();
+            $pad->url = $contact->cf('Ссылка на канал')->getValue() ?: 'https://google.com';
             $pad->create();
 
             if (empty($result->error)) {
