@@ -72,7 +72,7 @@ class CreateContract extends Command
 
                 Notes::addOne($lead, 'Произошла ошибка при создании договора : '.json_encode($result->error));
 
-                return;
+                exit;
             }
 
             $searchBaseContract = Contract::query()

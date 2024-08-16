@@ -70,7 +70,7 @@ class CreateCreative extends Command
 
             Notes::addOne($lead, 'Креатив не загружен, нет медиа в сделке');
 
-            return;
+            exit;
         }
 
         try {
@@ -99,7 +99,7 @@ class CreateCreative extends Command
 
             Notes::addOne($lead, 'Произошла ошибка при загрузке медиа : '.$e->getFile().' '.$e->getLine().' '.$e->getMessage());
 
-            return;
+            exit;
         }
 
         try {

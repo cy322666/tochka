@@ -58,6 +58,21 @@ class CreatePad extends Command
 
         $name = $lead->pipeline_id == self::IG_PIPELINE_ID ? $contact->cf('Ник блогера')->getValue() : $contact->cf('Название канала')->getValue();
 
+        if (!$searchPerson)
+
+            sleep(15);
+
+        $searchPerson = Person::query()
+            ->where('uuid', $transaction->person_uuid)
+            ->first();
+
+        if (!$searchPerson) {
+
+            Notes::addOne($lead,'При создании площадки не нашли контрагента');
+
+            exit;
+        }
+
         $searchPad = Pad::query()
             ->where('person_external_id', $searchPerson->uuid)
             ->where('name', $name)
@@ -79,8 +94,12 @@ class CreatePad extends Command
                 $transaction->pad_uuid = $pad->uuid;
 
                 Notes::addOne($lead,'Успешное создание площадки : '.$pad->uuid);
-            } else
+            } else {
+
                 Notes::addOne($lead, 'Произошла ошибка при создании площадки : '.json_encode($result->error));
+
+                exit;
+            }
         } else {
 
             $transaction->pad_uuid = $searchPad->uuid;
