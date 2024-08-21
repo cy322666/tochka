@@ -109,8 +109,8 @@ class CreateCreative extends Command
             $creative->name = $creativeName;
             $creative->brand = 'ООО "Точка знаний"';
             $creative->pay_type = 'cpm';
-            $creative->form = $lead->cf('Форма креатива')->getValue() ?? 'text_graphic_block';
-            $creative->url = $lead->cf('Уникальная ссылка')->getValue() ?? '-';
+            $creative->form = $lead->cf('Форма креатива')->getValue() ?: 'text_graphic_block';
+            $creative->url = $lead->cf('Уникальная ссылка')->getValue() ?: '-';
             $creative->texts = [Text::query()->where('key', $lead->cf('Шаблон креатива')->getValue())->first()->text];
             $creative->media_external_ids = [$media->uuid];
 
