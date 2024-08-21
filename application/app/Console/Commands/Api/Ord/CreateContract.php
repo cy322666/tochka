@@ -63,7 +63,7 @@ class CreateContract extends Command
             $contract->type = 'service';
             $contract->client_external_id = $transaction->person_uuid;
             $contract->contractor_external_id = 'my';
-            $contract->date = Carbon::parse($lead->cf('Дата договора')->getValue())->format('Y-m-d');
+            $contract->date = Carbon::parse($lead->cf('Номер договора')->getValue())->format('Y-m-d');
             $contract->serial = $lead->cf('Номер заявки')->getValue();
             $contract->subject_type = 'distribution';
             $result = $contract->create();
