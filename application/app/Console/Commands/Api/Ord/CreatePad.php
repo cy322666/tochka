@@ -42,6 +42,8 @@ class CreatePad extends Command
     {
         $transaction = Transaction::query()->find($this->argument('transaction'));
 
+        $transaction->refresh();
+
         $ordApi = new OrdService(env('APP_ENV'));
         $amoApi = (new Client(
             Account::query()
@@ -56,22 +58,14 @@ class CreatePad extends Command
             ->where('uuid', $transaction->person_uuid)
             ->first();
 
-        $name = $lead->pipeline_id == self::IG_PIPELINE_ID ? $contact->cf('Ник блогера')->getValue() : $contact->cf('Название канала')->getValue();
-
-        if (!$searchPerson)
-
-            sleep(15);
-
-        $searchPerson = Person::query()
-            ->where('uuid', $transaction->person_uuid)
-            ->first();
-
         if (!$searchPerson) {
 
             Notes::addOne($lead,'При создании площадки не нашли контрагента');
 
             exit;
         }
+
+        $name = $lead->pipeline_id == self::IG_PIPELINE_ID ? $contact->cf('Ник блогера')->getValue() : $contact->cf('Название канала')->getValue();
 
         $searchPad = Pad::query()
             ->where('person_external_id', $searchPerson->uuid)

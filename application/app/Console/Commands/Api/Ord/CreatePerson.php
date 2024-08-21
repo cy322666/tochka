@@ -76,8 +76,6 @@ class CreatePerson extends Command
             Notes::addOne($lead, 'Успешная синхронизация существующего контрагента в ОРД : '.$transaction->person_uuid);
         }
 
-//        $ordApi->person()->get($searchPerson ? $searchPerson->uuid : $person->uuid);
-
         $transaction->company_id = $company->id;
         $transaction->contact_id = $lead->contact->id;
         $transaction->save();
