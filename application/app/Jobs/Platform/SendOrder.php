@@ -146,8 +146,9 @@ class SendOrder implements ShouldQueue
         $lead = $amoApi->service->leads()->find($lead->id);
 
         //тут частичная оплата или нет
-        if ($this->order->status_order == 'Частично оплачен' &&
-            ($this->order->cost_money == ($this->order->left_cost_money + $this->order->payed_money))) {
+        if (($this->order->status_order == 'Частично оплачен' &&
+            ($this->order->cost_money == ($this->order->left_cost_money + $this->order->payed_money))) ||
+            ($this->order->status_order == 'Завершен' && $this->order->payed_money == $this->order->cost_money)) {
 
                 $lead->cf('Первый платёж по заказу')->enable();
 
