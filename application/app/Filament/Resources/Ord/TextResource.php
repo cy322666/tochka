@@ -29,6 +29,7 @@ class TextResource extends Resource
                     ->autosize(),
                 Forms\Components\FileUpload::make('media')
                     ->label('Медиа')
+                    ->downloadable()
                     ->maxSize(9999024)
             ]);
     }
