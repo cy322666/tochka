@@ -29,7 +29,7 @@ class TextResource extends Resource
                     ->autosize(),
                 Forms\Components\FileUpload::make('media')
                     ->label('Медиа')
-                    ->maxSize(999024)
+                    ->maxSize(9999024)
             ]);
     }
 
