@@ -152,8 +152,7 @@ class SendOrder implements ShouldQueue
 
                 $lead->cf('Первый платёж по заказу')->enable();
 
-        } else
-            $lead->cf('Первый платёж по заказу')->disable();
+        }
 
         $lead->save();
 
