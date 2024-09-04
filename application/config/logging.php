@@ -65,6 +65,13 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'sheets' => [
+            'driver' => 'stack',
+            'path' => storage_path('logs/sheets.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+        ],
+
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),
