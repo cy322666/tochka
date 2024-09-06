@@ -23,7 +23,7 @@ class SheetsController extends Controller
     public function hook(Request $request)
     {
         Artisan::call('app:search-count', [
-            'name' => $request->name,
+            'lead_id' => $request->lead_id,
             'url'  => $request->url,
         ]);
     }

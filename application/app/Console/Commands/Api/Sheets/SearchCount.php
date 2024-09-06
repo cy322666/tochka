@@ -14,7 +14,7 @@ class SearchCount extends Command
      *
      * @var string
      */
-    protected $signature = 'app:search-count {name} {url}';
+    protected $signature = 'app:search-count {lead_id} {url}';
 
     /**
      * The console command description.
