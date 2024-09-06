@@ -34,7 +34,7 @@ class SearchCount extends Command
             ->where('url', $url)
             ->first();
 
-        $response = Http::post('https://h.albato.ru/wh/38/1lfh5q5/ymqv4-g3P2kzL58uu4SONJUsKo5jX-yuD5GHv5PPYCo/', [
+        $response = Http::async()->post('https://h.albato.ru/wh/38/1lfh5q5/ymqv4-g3P2kzL58uu4SONJUsKo5jX-yuD5GHv5PPYCo/', [
             'name' => $link->name,
             'lead_id' => $this->argument('lead_id'),
         ]);
