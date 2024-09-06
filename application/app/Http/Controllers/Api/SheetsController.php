@@ -15,9 +15,15 @@ class SheetsController extends Controller
         Log::channel('sheets')->info(__METHOD__, $request->toArray());
     }
 
-    public function links()
+    public function links(Request $request)
     {
-        Log::channel('sheets')->info(__METHOD__, $request->toArray());
+        Link::query()->updateOrCreate([
+            'url' => $request->url
+        ], [
+            'name' => $request->name,
+            'type' => $request->type,
+            'link_id' => $request->link_id,
+        ]);
     }
 
     public function hook(Request $request)
