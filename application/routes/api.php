@@ -29,6 +29,8 @@ Route::get('platform/orders', [PlatformController::class, 'order']);
 
 Route::post('salesbot/filter/contects-hook', [SalesBotController::class, 'filterContecst']);
 
-Route::post('sheets/directories/links', [SheetsController::class, 'links']);
+Route::post('sheets/directories/links', [SheetsController::class, 'links']);//добавение ссылки в таблицу ссылок
 
-Route::post('sheets/subscribes', [SheetsController::class, 'subscribes']);
+Route::post('sheets/hook', [SheetsController::class, 'hook']);//хук от альбато с ссылкой
+
+Route::post('sheets/subscribes', [SheetsController::class, 'subscribes']);//подписчики
