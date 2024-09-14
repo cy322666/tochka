@@ -18,6 +18,8 @@ class SheetsController extends Controller
 
     public function links(Request $request)
     {
+        Log::info(__METHOD__, $request->toArray());
+
         Link::query()->updateOrCreate([
             'url' => $request->url
         ], [
