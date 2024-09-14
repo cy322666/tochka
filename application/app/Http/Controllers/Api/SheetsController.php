@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Api\Sheets\Directories\Link;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class SheetsController extends Controller
@@ -28,9 +29,16 @@ class SheetsController extends Controller
 
     public function hook(Request $request)
     {
-        Artisan::call('app:search-count', [
-            'lead_id' => $request->lead_id,
-            'url'  => $request->url,
-        ]);
+        $lastLeadId = Cache::get('last_lead_id');
+
+        if ($lastLeadId !== $request->lead_id) {
+
+            Cache::set('last_lead_id', $request->lead_id);
+
+            Artisan::call('app:search-count', [
+                'lead_id' => $request->lead_id,
+                'url'  => $request->url,
+            ]);
+        }
     }
 }
