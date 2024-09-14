@@ -61,8 +61,8 @@ class CreateContract extends Command
 
             $contract->uuid = Uuid::uuid4();
             $contract->type = 'service';
-            $contract->client_external_id = $transaction->person_uuid;
-            $contract->contractor_external_id = 'my';
+            $contract->client_external_id = 'my';
+            $contract->contractor_external_id = $transaction->person_uuid;
             $contract->date = Carbon::parse($lead->cf('Дата договора')->getValue())->format('Y-m-d');
             $contract->serial = $lead->cf('Номер договора')->getValue();
             $contract->subject_type = 'distribution';
@@ -116,7 +116,7 @@ class CreateContract extends Command
 
             $contract->uuid = Uuid::uuid4();
             $contract->type = 'additional';
-            $contract->client_external_id = $searchBaseContract->client_external_id;
+            $contract->client_external_id = 'my';
             $contract->contractor_external_id = $searchBaseContract->contractor_external_id;
             $contract->date = Carbon::parse($lead->cf('Дата заявки')->getValue())->format('Y-m-d');
             $contract->serial = $lead->cf('Номер заявки')->getValue();
