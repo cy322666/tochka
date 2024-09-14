@@ -29,6 +29,8 @@ class SheetsController extends Controller
 
     public function hook(Request $request)
     {
+        Log::info(__METHOD__.' : '.$request->lead_id);
+
         $lastLeadId = Cache::get('last_lead_id');
 
         if ($lastLeadId !== $request->lead_id) {
