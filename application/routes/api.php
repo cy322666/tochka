@@ -34,3 +34,5 @@ Route::post('sheets/directories/links', [SheetsController::class, 'links']);//д
 Route::post('sheets/hook', [SheetsController::class, 'hook']);//хук от альбато с ссылкой
 
 Route::post('sheets/subscribes', [SheetsController::class, 'subscribes']);//подписчики
+
+Route::post('site/consultations', [SheetsController::class, 'consultations']);//подписчики
