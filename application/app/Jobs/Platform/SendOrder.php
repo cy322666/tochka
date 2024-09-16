@@ -83,6 +83,7 @@ class SendOrder implements ShouldQueue
             $lead = Leads::searchActive($contact, $amoApi, [
                 Order::OP_PIPELINE_ID,
                 Order::DOP_PIPELINE_ID,
+                Order::EXT_PIPELINE_ID,
                 Order::SERVICE_PIPELINE_ID,
             ]);
 
@@ -99,12 +100,14 @@ class SendOrder implements ShouldQueue
                 $lead = Leads::searchInStatus($contact, $amoApi, [
                     Order::OP_PIPELINE_ID,
                     Order::DOP_PIPELINE_ID,
+                    Order::EXT_PIPELINE_ID,
                     Order::SERVICE_PIPELINE_ID,
                 ], 142);
 
                 if ($lead &&
                    ($lead->pipeline_id == Order::OP_PIPELINE_ID ||
-                    $lead->pipeline_id == Order::DOP_PIPELINE_ID)) {
+                    $lead->pipeline_id == Order::DOP_PIPELINE_ID ||
+                    $lead->pipeline_id == Order::EXT_PIPELINE_ID)) {
                         //если нашли, то это повторник -> сервис
                         Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Есть сделка в продажных воронках -> повторник');
 
@@ -151,7 +154,6 @@ class SendOrder implements ShouldQueue
             ($this->order->status_order == 'Завершен' && $this->order->payed_money == $this->order->cost_money)) {
 
                 $lead->cf('Первый платёж по заказу')->enable();
-
         }
 
         $lead->save();

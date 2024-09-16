@@ -47,14 +47,17 @@ class Order extends Model
         SERVICE_PIPELINE_ID = 4870069,
         KVAL_PIPELINE_ID = 6552278,
         DOP_PIPELINE_ID = 5674156,
+        EXT_PIPELINE_ID = 8616182,
 
         INIT_OP_STATUS_ID = 50954683,
         INIT_SERVICE_STATUS_ID = 50885656,
         INIT_DOP_STATUS_ID = 49931782,
+        INIT_EXT_STATUS_ID = 69891894,
 
         PAY_OP_STATUS_ID = 47314576,
         PAY_SERVICE_STATUS_ID = 50886724,
-        PAY_DOP_STATUS_ID = 142;
+        PAY_DOP_STATUS_ID = 142,
+        PAY_EXT_STATUS_ID = 142;
 
     //чекаем куда отправлять активную сделку
     public function matchStatusByStateActive($lead)
@@ -71,6 +74,7 @@ class Order extends Model
                 self::SERVICE_PIPELINE_ID => self::INIT_SERVICE_STATUS_ID,
                 //активная в допродажах и новый заказ -> оставляем как есть
                 self::DOP_PIPELINE_ID => $lead->pipeline_id,
+                self::EXT_PIPELINE_ID => $lead->pipeline_id,
             };
 
         if ($this->status_order == 'Оплачен' ||
@@ -85,6 +89,7 @@ class Order extends Model
                 self::SERVICE_PIPELINE_ID => self::PAY_SERVICE_STATUS_ID,
                 //активная в допродажах и оплаченный заказ -> оставляем как есть
                 self::DOP_PIPELINE_ID => $lead->pipeline_id,
+                self::EXT_PIPELINE_ID => $lead->pipeline_id,
             };
 
         if ($this->status_order == 'Отменен')
@@ -94,6 +99,7 @@ class Order extends Model
                 self::OP_PIPELINE_ID, self::KVAL_PIPELINE_ID, self::SERVICE_PIPELINE_ID => 143,
 
                 self::DOP_PIPELINE_ID => $lead->pipeline_id,
+                self::EXT_PIPELINE_ID => $lead->pipeline_id,
             };
     }
 
@@ -196,7 +202,8 @@ class Order extends Model
     public static function isFirst(Contact $contact, $amoApi) : bool
     {
         if (Leads::searchInPipeline($contact, $amoApi, Order::SERVICE_PIPELINE_ID) ||
-            Leads::searchInPipeline($contact, $amoApi, Order::DOP_PIPELINE_ID))
+            Leads::searchInPipeline($contact, $amoApi, Order::DOP_PIPELINE_ID) ||
+            Leads::searchInPipeline($contact, $amoApi, Order::EXT_PIPELINE_ID))
 
             return false;
         else
