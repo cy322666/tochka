@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands\Api\Platform;
 
-use App\Models\GetCourse\Order;
 use Illuminate\Console\Command;
 
 class SendOrder extends Command

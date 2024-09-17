@@ -10,4 +10,11 @@ class Link extends Model
     use HasFactory;
 
     protected $table = 'sheets_links';
+
+    protected $fillable = [
+        'link_id',
+        'name',
+        'url',
+        'type'
+    ];
 }
