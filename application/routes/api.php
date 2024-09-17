@@ -28,7 +28,7 @@ Route::post('msg/hook', [MessagesController::class, 'hook']);
 
 Route::get('platform/orders', [PlatformController::class, 'order']);
 
-Route::post('salesbot/filter/contects-hook', [SalesBotController::class, 'filterContecst']);
+//Route::post('salesbot/filter/contects-hook', [SalesBotController::class, 'filterContecst']);
 
 Route::post('sheets/directories/links', [SheetsController::class, 'links']);//добавение ссылки в таблицу ссылок
 
@@ -36,4 +36,4 @@ Route::post('sheets/hook', [SheetsController::class, 'hook']);//хук от ал
 
 Route::post('sheets/subscribes', [SheetsController::class, 'subscribes']);//подписчики
 
-Route::post('site/consultations', [SiteController::class, 'consultations']);//подписчики
+Route::post('site/consultations', [SiteController::class, 'consultations']);
