@@ -15,6 +15,8 @@ class Kernel extends ConsoleKernel
 //         $schedule->command('messages:incoming')->everyFiveMinutes();
 
         $schedule->command('telescope:prune --hours=24')->daily();
+
+        $schedule->command('app:get-page-link')->everyFiveMinutes();
 //        $schedule->command('horizon:snapshot')->everyFiveMinutes();
 
 //        $schedule->command('app:send-fail-cron')->everyMinute();
