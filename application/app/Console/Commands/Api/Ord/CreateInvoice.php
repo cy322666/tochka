@@ -4,6 +4,8 @@ namespace App\Console\Commands\Api\Ord;
 
 use App\Models\Account;
 use App\Models\Api\Ord\Contract;
+use App\Models\Api\Ord\Pad;
+use App\Models\Api\Ord\Person;
 use App\Models\Api\Ord\Transaction;
 use App\Services\amoCRM\Client;
 use App\Services\amoCRM\Models\Notes;
@@ -34,7 +36,7 @@ class CreateInvoice extends Command
      */
     public function handle()
     {
-        $transaction = Transaction::query()->find($this->argument('transaction'));
+        $transaction = Transaction::query()->find($this->argument('?transaction'));
 
         $ordApi = new OrdService(env('APP_ENV'));
         $amoApi = (new Client(
@@ -43,7 +45,47 @@ class CreateInvoice extends Command
                 ->first()
         ))->init();
 
-        $lead    = $amoApi->service->leads()->find($transaction->lead_id);
+        $lead = $amoApi->service->leads()->find($this->argument('lead_id'));
+
+        if (!$transaction) {
+
+            $searchPerson = Person::query()
+                ->where('inn', $company->cf('ИНН')->getValue())
+                ->first();
+
+            $contract = Contract::query()
+                ->where('serial', $lead->cf('Номер заявки')->getValue())
+                ->where('type', '!=', 'service')
+                ->latest('created_at')
+                ->first();
+
+            $searchPad = Pad::query()
+                ->where('person_external_id', $searchPerson->uuid)
+                ->where('name', $name)
+                ->first();
+
+            $personUuid = $searchPerson->uuid;
+            $padUuid  = $searchPad->uuid;
+            $contractUuid   = $contract->uuid;
+            $contractSerial = $contract->contract_serial;
+
+            $transaction = Transaction::query()
+                ->create([
+                    'lead_id' => $lead->id,
+                    'contact_id' => $lead->contact->id,
+                    'company_id' => $lead->company->id,
+                    'person_uuid' => $personUuid,
+                    'contract_uuid' => $contractUuid,
+                    'contract_serial' => $contractSerial,
+                    'pad_uuid' => $padUuid
+                ]);
+
+        } else {
+
+            $contractUuid   = $transaction->contract_uuid;
+            $contractSerial = $transaction->contract_serial;
+        }
+
         $invoice = $ordApi->invoice();
 
         $date = Carbon::parse($lead->cf('Дата рекламы')->getValue())->format('Y-m-d') ?? Carbon::now()->format('Y-m-d');
@@ -53,17 +95,17 @@ class CreateInvoice extends Command
         $dateEndPlan = Carbon::parse($lead->cf('Дата окончания план')->getValue())->format('Y-m-d') ?? Carbon::now()->format('Y-m-d');
 
         $invoice->uuid = Uuid::uuid4();
-        $invoice->contract_external_id = $transaction->contract_uuid;
+        $invoice->contract_external_id = $contractUuid;
         $invoice->date = $dateExpose;
         $invoice->date_start = $dateStart;
         $invoice->date_end = $dateEnd;
         $invoice->amount = $lead->sale;
         $invoice->client_role = 'agency';
         $invoice->contractor_role = 'publisher';
-        $invoice->serial = $transaction->contract_serial;
+        $invoice->serial = $contractSerial;
 
         $invoice->creative_external_id = $transaction->creative_uuid;
-        $invoice->pad_external_id = $transaction->pad_uuid;
+        $invoice->pad_external_id = $padUuid;
         $invoice->date_start_planned = $dateStart;
         $invoice->date_end_planned = $dateEndPlan;
         $invoice->date_start_actual = $dateStart;
@@ -71,7 +113,7 @@ class CreateInvoice extends Command
         $invoice->amount_per_event = $lead->sale / $lead->cf('Количество показов')->getValue();
         $invoice->invoice_shows_count = $lead->cf('Количество показов')->getValue() * 1000;
 
-        $invoice->pad_external_id = $transaction->pad_uuid;
+        $invoice->pad_external_id = $padUuid;
         $invoice->creative_external_id = $transaction->creative_uuid;
         $invoice->date_start_planned = $date;
         $invoice->date_end_planned  = $dateEndPlan;
