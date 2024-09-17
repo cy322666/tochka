@@ -60,24 +60,44 @@ class CreatePerson extends Command
             $person->role  = 'publisher';
             $result = $person->create();
 
+
             if (empty($result->error)) {
 
                 $transaction->person_uuid = $person->uuid;
                 $transaction->save();
 
                 Notes::addOne($lead, 'Успешное создание контрагента : '.$transaction->person_uuid);
-            } else
+
+                $lead->cf('ОРД Контрагент')->setValue(json_encode($result));
+                $lead->save();
+
+                $transaction->company_id = $company->id;
+                $transaction->contact_id = $lead->contact->id;
+                $transaction->save();
+
+                return true;
+
+            } else {
+
                 Notes::addOne($lead, 'Произошла ошибка при синхронизации контрагента : '.json_encode($result->error));
+
+                return false;
+            }
         } else {
 
+            $transaction->company_id = $company->id;
+            $transaction->contact_id = $lead->contact->id;
             $transaction->person_uuid = $searchPerson->uuid;
             $transaction->save();
 
             Notes::addOne($lead, 'Успешная синхронизация существующего контрагента в ОРД : '.$transaction->person_uuid);
-        }
 
-        $transaction->company_id = $company->id;
-        $transaction->contact_id = $lead->contact->id;
-        $transaction->save();
+            $result = $ordApi->person()->get($transaction->person_uuid);
+
+            $lead->cf('ОРД Контрагент')->setValue(json_encode($result));
+            $lead->save();
+
+            return true;
+        }
     }
 }
