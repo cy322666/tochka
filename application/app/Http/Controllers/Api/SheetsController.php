@@ -13,13 +13,10 @@ class SheetsController extends Controller
 {
     public function subscribes(Request $request)
     {
-        Log::channel('sheets')->info(__METHOD__, $request->toArray());
     }
 
     public function links(Request $request)
     {
-        Log::channel('sheets')->info(__METHOD__, $request->toArray());
-
         Link::query()->updateOrCreate([
             'url' => $request->url
         ], [
@@ -31,8 +28,6 @@ class SheetsController extends Controller
 
     public function hook(Request $request)
     {
-        Log::channel('sheets')->info(__METHOD__.' : '.$request->lead_id);
-
         $lastLeadId = Cache::get('last_lead_id');
 
         if ($lastLeadId !== $request->lead_id) {
