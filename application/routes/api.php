@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\OrdController;
 use App\Http\Controllers\Api\PlatformController;
 use App\Http\Controllers\Api\SalesBotController;
 use App\Http\Controllers\Api\SheetsController;
+use App\Http\Controllers\Api\SiteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -35,4 +36,4 @@ Route::post('sheets/hook', [SheetsController::class, 'hook']);//хук от ал
 
 Route::post('sheets/subscribes', [SheetsController::class, 'subscribes']);//подписчики
 
-Route::post('site/consultations', [SheetsController::class, 'consultations']);//подписчики
+Route::post('site/consultations', [SiteController::class, 'consultations']);//подписчики
