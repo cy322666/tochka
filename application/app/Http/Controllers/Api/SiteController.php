@@ -38,7 +38,7 @@ class SiteController extends Controller
 
         $lead = Leads::create($contact, [
             'responsible_user_id' => 5998951,
-            'pipeline_id' => Order::OP_PIPELINE_ID,
+            'status_id' => 69891566,
         ], 'Новая заявка с сайта на консультацию');
 
         $lead->cf('Источник обращения')->setValue('Заявка с сайта на консультацию');
