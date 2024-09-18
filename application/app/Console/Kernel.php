@@ -22,6 +22,7 @@ class Kernel extends ConsoleKernel
 //        $schedule->command('app:send-fail-cron')->everyMinute();
 
         $schedule->command('ord:get-persons')->everyMinute();
+        $schedule->command('ord:get-creative')->everyTenMinutes();
         $schedule->command('ord:get-contracts')->everyFiveMinutes();
         $schedule->command('ord:get-pads')->everyFiveMinutes();
     }

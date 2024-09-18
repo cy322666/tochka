@@ -36,9 +36,6 @@ class CreateContract extends Command
      */
     public function handle()
     {
-        //ищем базовый
-        //если нет создаем
-        //если есть то крепим
         $transaction = Transaction::query()->find($this->argument('transaction'));
 
         $ordApi = new OrdService(env('APP_ENV'));
@@ -49,6 +46,13 @@ class CreateContract extends Command
         ))->init();
 
         $lead = $amoApi->service->leads()->find($transaction->lead_id);
+
+        if (!$transaction->person_uuid) {
+
+            Notes::addOne($lead, 'Произошла ошибка при создании договора : контрагент не сохранен в БД');
+
+            return false;
+        }
 
         $searchBaseContract = Contract::query()
             ->where('contractor_external_id', $transaction->person_uuid)
@@ -70,10 +74,13 @@ class CreateContract extends Command
 
             if (!empty($result->error)) {
 
-                Notes::addOne($lead, 'Произошла ошибка при создании договора : '.json_encode($result->error));
+                Notes::addOne($lead, 'Произошла ошибка при создании договора, ответ апи : '.json_encode($result->error));
 
-                exit;
+                return false;
             }
+
+            $lead->cf('ОРД Договор')->setValue(json_encode($result));
+            $lead->save();
 
             $searchBaseContract = Contract::query()
                 ->create([
@@ -90,6 +97,8 @@ class CreateContract extends Command
                 ' Успешное создание договора : '.$searchBaseContract->uuid.' , '.$searchBaseContract->serial,
             ]));
         }
+
+        //заявка
 
         $contract = Contract::query()
             ->where('serial', $lead->cf('Номер заявки')->getValue())
@@ -108,6 +117,13 @@ class CreateContract extends Command
                 ' Договор : '.$searchBaseContract->uuid.' , '.$searchBaseContract->serial,
                 ' Заявка : '.$contract->uuid.' , '.$contract->serial,
             ]));
+
+            $result = $ordApi->contract()->get($contract->uuid);
+
+            $lead->cf('ОРД Заявка')->setValue(json_encode($result));
+            $lead->save();
+
+            return true;
 
         } else {
 
@@ -137,8 +153,19 @@ class CreateContract extends Command
                     ' Договор : '.$searchBaseContract->uuid.' , '.$searchBaseContract->serial,
                     ' Заявка : '.$contract->uuid.' , '.$contract->serial,
                 ]));
-            } else
-                Notes::addOne($lead, 'Произошла ошибка при создании заявки : '.json_encode($result->error));
+
+                $lead->cf('ОРД Заявка')->setValue(json_encode($result));
+                $lead->save();
+
+                return true;
+
+            } else {
+
+                Notes::addOne($lead, 'Произошла ошибка при создании заявки, ответ апи : '.json_encode($result->error));
+
+                return false;
+            }
+
         }
     }
 }

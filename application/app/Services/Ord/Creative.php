@@ -57,12 +57,12 @@ class Creative
         $response = Http::withHeaders($this->service->getHeaders())
             ->get($this->service::$baseUrl.'/v1/creative/'.$id);
 
-        return $this->service->parseResponse($response);
+        return (object)$response->json();
     }
 
     public function list(): array
     {
-        for ($offset = 0, $limit = 1, $persons = [] ; ; $offset += $limit) {
+        for ($offset = 0, $limit = 1000, $persons = [] ; ; $offset += $limit) {
 
             $response = Http::withHeaders($this->service->getHeaders())
                 ->get($this->service::$baseUrl.'/v1/creative', [
@@ -70,10 +70,15 @@ class Creative
                     'offset' => $offset,
                 ]);
 
-            $persons = array_merge(
-                (array)($this->service->parseResponse($response))->external_ids,
-                $persons
-            );
+            $resp = $this->service->parseResponse($response);
+
+            if ($resp)
+                $persons = array_merge(
+                    (array)($this->service->parseResponse($response))->external_ids,
+                    $persons
+                );
+            else
+                break;
         }
 
         return $persons;

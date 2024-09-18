@@ -16,10 +16,14 @@ class OrdController extends Controller
             'lead_id' => $request->leads['status'][0]['id'],
         ]);
 
-        Artisan::call('ord:create-person',   ['transaction' => $transaction->id]);
-        Artisan::call('ord:create-contract', ['transaction' => $transaction->id]);
-        Artisan::call('ord:create-pad',      ['transaction' => $transaction->id]);
-        Artisan::call('ord:create-creative', ['transaction' => $transaction->id]);
+        $result1 = Artisan::call('ord:create-person',   ['transaction' => $transaction->id]);
+
+        if ($result1)
+            $result2 = Artisan::call('ord:create-contract', ['transaction' => $transaction->id]);
+        if ($result2)
+            $result3 = Artisan::call('ord:create-pad',      ['transaction' => $transaction->id]);
+        if ($result3)
+            $result4 = Artisan::call('ord:create-creative', ['transaction' => $transaction->id]);
     }
 
     public function invoice(Request $request)
@@ -28,6 +32,9 @@ class OrdController extends Controller
             ->where('lead_id',  $request->leads['status'][0]['id'])
             ->first();
 
-        Artisan::call('ord:create-invoice',  ['transaction' => $transaction->id]);
+        Artisan::call('ord:create-invoice',  [
+            'transaction' => $transaction->id,
+            'lead_id' => $request->leads['status'][0]['id'],
+        ]);
     }
 }

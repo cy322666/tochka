@@ -47,6 +47,13 @@ class CreateCreative extends Command
         $ordApi = new OrdService(env('APP_ENV'));
         $amoApi = (new Client($account))->init();
 
+        if (!$transaction->contact_id || !$transaction->lead_id) {
+
+            Notes::addOne($lead, 'Сделка или контакт для работы не указаны в бд');
+
+            return false;
+        }
+
         $contact = $amoApi->service->contacts()->find($transaction->contact_id);
         $lead    = $amoApi->service->leads()->find($transaction->lead_id);
 
@@ -59,8 +66,12 @@ class CreateCreative extends Command
             ->where('key', $lead->cf('Шаблон креатива')->getValue())
             ->first();
 
-        if (!$template)
-            Notes::addOne($lead, 'Такой шаблон не найден');
+        if (!$template) {
+
+            Notes::addOne($lead, 'Такой шаблон не найден : '.$lead->cf('Шаблон креатива')->getValue());
+
+            return false;
+        }
 
         $format = explode('.', $template->media)[1];
 
@@ -70,7 +81,7 @@ class CreateCreative extends Command
 
             Notes::addOne($lead, 'Креатив не загружен, нет медиа в сделке');
 
-            exit;
+            return false;
         }
 
         try {
@@ -87,19 +98,20 @@ class CreateCreative extends Command
 
             $result = $media->create();
 
-            Log::debug(__METHOD__.' media response : '.$result);
-
             $transaction->media_sha = json_decode($result)->sha256;
             $transaction->media = $media->uuid;
             $transaction->save();
 
             Notes::addOne($lead, 'Успешная загрузка медиа : '.$transaction->media);
 
+            $lead->cf('ОРД Медиа')->setValue(json_encode($result));
+            $lead->save();
+
         } catch (\Throwable $e) {
 
             Notes::addOne($lead, 'Произошла ошибка при загрузке медиа : '.$e->getFile().' '.$e->getLine().' '.$e->getMessage());
 
-            exit;
+            return false;
         }
 
         try {
@@ -116,9 +128,10 @@ class CreateCreative extends Command
 
             $result = $creative->create();
 
-            Log::debug(__METHOD__.' creative response : ', [$result]);
+            $lead->cf('ОРД Креатив')->setValue(json_encode($result));
+            $lead->save();
 
-            if (empty($result->error) && $result) {
+            if (empty($result->error)) {
 
                 $transaction->erid   = $result->erid;
                 $transaction->marker = $result->marker;
@@ -128,21 +141,24 @@ class CreateCreative extends Command
                 Notes::addOne($lead, implode("\n", [
                     ' Успешное создание креатива : ',
                     ' erid : '.$transaction->erid,
-                    ' market : '.$transaction->marker,
                 ]));
 
                 $lead->cf('Токен')->setValue($transaction->erid);
                 $lead->save();
 
+                return true;
+
             } else {
 
-                Notes::addOne($lead, 'Произошла ошибка при создании креатива');
+                Notes::addOne($lead, 'Произошла ошибка при создании креатива : '.json_encode($result->error));
 
-                Log::error(__METHOD__, $result ? [$result->error] : ['Неизвестная ошибка']);
+                return false;
             }
         } catch (\Throwable $e) {
 
             Notes::addOne($lead, 'Произошла ошибка при создании креатива : '.$e->getFile().' '.$e->getLine().' '.$e->getMessage());
+
+            return false;
         }
     }
 }

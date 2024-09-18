@@ -42,8 +42,6 @@ class CreatePad extends Command
     {
         $transaction = Transaction::query()->find($this->argument('transaction'));
 
-        $transaction->refresh();
-
         $ordApi = new OrdService(env('APP_ENV'));
         $amoApi = (new Client(
             Account::query()
@@ -54,15 +52,24 @@ class CreatePad extends Command
         $lead = $amoApi->service->leads()->find($transaction->lead_id);
         $contact = $lead->contact;
 
+        sleep(3);
+
+        if (!$transaction->person_uuid) {
+
+            Notes::addOne($lead,'При создании площадки нет контрагента в БД');
+
+            return false;
+        }
+
         $searchPerson = Person::query()
             ->where('uuid', $transaction->person_uuid)
             ->first();
 
         if (!$searchPerson) {
 
-            Notes::addOne($lead,'При создании площадки не нашли контрагента');
+            Notes::addOne($lead,'При создании площадки не нашли контрагента по uuid : '.$transaction->person_uuid);
 
-            exit;
+            return false;
         }
 
         $name = $lead->pipeline_id == self::IG_PIPELINE_ID ? $contact->cf('Ник блогера')->getValue() : $contact->cf('Название канала')->getValue();
@@ -86,21 +93,34 @@ class CreatePad extends Command
             if (empty($result->error)) {
 
                 $transaction->pad_uuid = $pad->uuid;
+                $transaction->save();
 
                 Notes::addOne($lead,'Успешное создание площадки : '.$pad->uuid);
+
+                $lead->cf('ОРД Площадка')->setValue(json_encode($result));
+                $lead->save();
+
+                return true;
+
             } else {
 
                 Notes::addOne($lead, 'Произошла ошибка при создании площадки : '.json_encode($result->error));
 
-                exit;
+                return false;
             }
         } else {
 
             $transaction->pad_uuid = $searchPad->uuid;
+            $transaction->save();
 
             Notes::addOne($lead, 'Успешная синхронизация существующей площадки : '.$transaction->pad_uuid);
-        }
 
-        $transaction->save();
+            $result = $ordApi->pad()->get($searchPad->uuid);
+
+            $lead->cf('ОРД Площадка')->setValue(json_encode($result));
+            $lead->save();
+
+            return true;
+        }
     }
 }
