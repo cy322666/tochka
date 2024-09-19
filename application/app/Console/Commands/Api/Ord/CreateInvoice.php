@@ -22,7 +22,7 @@ class CreateInvoice extends Command
      *
      * @var string
      */
-    protected $signature = 'ord:create-invoice {transaction?} {lead_id}';
+    protected $signature = 'ord:create-invoice {lead_id} {transaction?}';
 
     /**
      * The console command description.
