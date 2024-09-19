@@ -90,9 +90,9 @@ class CreatePad extends Command
             $pad->url = $contact->cf('Ссылка на канал')->getValue() ?: 'https://google.com';
             $result = $pad->create();
 
-            $pad = $ordApi->pad()->get($pad->uuid);
+            $padNew = $ordApi->pad()->get($pad->uuid);
 
-            if ($pad && (!$result || empty($result->error))) {
+            if ($padNew && (!$result || empty($result->error))) {
 
                 $transaction->pad_uuid = $pad->uuid;
                 $transaction->save();
