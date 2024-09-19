@@ -22,7 +22,7 @@ class CreateInvoice extends Command
      *
      * @var string
      */
-    protected $signature = 'ord:create-invoice {transaction} {lead_id}';
+    protected $signature = 'ord:create-invoice {?transaction} {lead_id}';
 
     /**
      * The console command description.
@@ -37,7 +37,7 @@ class CreateInvoice extends Command
      */
     public function handle()
     {
-        $transaction = Transaction::query()->find($this->argument('?transaction'));
+        $transaction = $this->argument('transaction') ? Transaction::query()->find($this->argument('transaction')) : null;
 
         $ordApi = new OrdService(env('APP_ENV'));
         $amoApi = (new Client(
