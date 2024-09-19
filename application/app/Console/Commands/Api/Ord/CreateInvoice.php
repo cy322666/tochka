@@ -136,6 +136,6 @@ class CreateInvoice extends Command
             Notes::addOne($lead, 'Успешное создание акта : '.$transaction->invoice_uuid);
 
         } else
-            Notes::addOne($lead, 'Произошла ошибка при создании акта : '.$result ? json_encode($result->error) : 'Неизвестная ошибка');
+            Notes::addOne($lead, 'Произошла ошибка при создании акта : '.$result ? json_encode($result->error, JSON_UNESCAPED_UNICODE) : 'Неизвестная ошибка');
     }
 }

@@ -74,12 +74,12 @@ class CreateContract extends Command
 
             if (!empty($result->error)) {
 
-                Notes::addOne($lead, 'Произошла ошибка при создании договора, ответ апи : '.json_encode($result->error));
+                Notes::addOne($lead, 'Произошла ошибка при создании договора, ответ апи : '.json_encode($result->error, JSON_UNESCAPED_UNICODE));
 
                 return false;
             }
 
-            $lead->cf('ОРД Договор')->setValue(json_encode($result));
+            $lead->cf('ОРД Договор')->setValue(json_encode($result, JSON_UNESCAPED_UNICODE));
             $lead->save();
 
             $searchBaseContract = Contract::query()
@@ -120,7 +120,7 @@ class CreateContract extends Command
 
             $result = $ordApi->contract()->get($contract->uuid);
 
-            $lead->cf('ОРД Заявка')->setValue(json_encode($result));
+            $lead->cf('ОРД Заявка')->setValue(json_encode($result, JSON_UNESCAPED_UNICODE));
             $lead->save();
 
             return true;
@@ -154,14 +154,14 @@ class CreateContract extends Command
                     ' Заявка : '.$contract->uuid.' , '.$contract->serial,
                 ]));
 
-                $lead->cf('ОРД Заявка')->setValue(json_encode($result));
+                $lead->cf('ОРД Заявка')->setValue(json_encode($result, JSON_UNESCAPED_UNICODE));
                 $lead->save();
 
                 return true;
 
             } else {
 
-                Notes::addOne($lead, 'Произошла ошибка при создании заявки, ответ апи : '.json_encode($result->error));
+                Notes::addOne($lead, 'Произошла ошибка при создании заявки, ответ апи : '.json_encode($result->error, JSON_UNESCAPED_UNICODE));
 
                 return false;
             }

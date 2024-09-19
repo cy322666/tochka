@@ -97,14 +97,14 @@ class CreatePad extends Command
 
                 Notes::addOne($lead,'Успешное создание площадки : '.$pad->uuid);
 
-                $lead->cf('ОРД Площадка')->setValue($result ? json_encode($result) : null);
+                $lead->cf('ОРД Площадка')->setValue($result ? json_encode($result, JSON_UNESCAPED_UNICODE) : null);
                 $lead->save();
 
                 return true;
 
             } else {
 
-                Notes::addOne($lead, 'Произошла ошибка при создании площадки : '.json_encode($result->error));
+                Notes::addOne($lead, 'Произошла ошибка при создании площадки : '.json_encode($result->error, JSON_UNESCAPED_UNICODE));
 
                 return false;
             }
@@ -117,7 +117,7 @@ class CreatePad extends Command
 
             $result = $ordApi->pad()->get($searchPad->uuid);
 
-            $lead->cf('ОРД Площадка')->setValue(json_encode($result));
+            $lead->cf('ОРД Площадка')->setValue(json_encode($result, JSON_UNESCAPED_UNICODE));
             $lead->save();
 
             return true;

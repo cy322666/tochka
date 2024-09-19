@@ -104,7 +104,7 @@ class CreateCreative extends Command
 
             Notes::addOne($lead, 'Успешная загрузка медиа : '.$transaction->media);
 
-            $lead->cf('ОРД Медиа')->setValue(json_encode($result));
+            $lead->cf('ОРД Медиа')->setValue(json_encode($result, JSON_UNESCAPED_UNICODE));
             $lead->save();
 
         } catch (\Throwable $e) {
@@ -128,7 +128,7 @@ class CreateCreative extends Command
 
             $result = $creative->create();
 
-            $lead->cf('ОРД Креатив')->setValue(json_encode($result));
+            $lead->cf('ОРД Креатив')->setValue(json_encode($result, JSON_UNESCAPED_UNICODE));
             $lead->save();
 
             if (empty($result->error)) {
@@ -150,7 +150,7 @@ class CreateCreative extends Command
 
             } else {
 
-                Notes::addOne($lead, 'Произошла ошибка при создании креатива : '.json_encode($result->error));
+                Notes::addOne($lead, 'Произошла ошибка при создании креатива : '.json_encode($result->error, JSON_UNESCAPED_UNICODE));
 
                 return false;
             }

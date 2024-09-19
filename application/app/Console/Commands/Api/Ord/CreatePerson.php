@@ -68,7 +68,7 @@ class CreatePerson extends Command
 
                 Notes::addOne($lead, 'Успешное создание контрагента : '.$transaction->person_uuid);
 
-                $lead->cf('ОРД Контрагент')->setValue(json_encode($result));
+                $lead->cf('ОРД Контрагент')->setValue(json_encode($result, JSON_UNESCAPED_UNICODE));
                 $lead->save();
 
                 $transaction->company_id = $company->id;
@@ -79,7 +79,7 @@ class CreatePerson extends Command
 
             } else {
 
-                Notes::addOne($lead, 'Произошла ошибка при синхронизации контрагента : '.json_encode($result->error));
+                Notes::addOne($lead, 'Произошла ошибка при синхронизации контрагента : '.json_encode($result->error, JSON_UNESCAPED_UNICODE));
 
                 return false;
             }
@@ -94,7 +94,7 @@ class CreatePerson extends Command
 
             $result = $ordApi->person()->get($transaction->person_uuid);
 
-            $lead->cf('ОРД Контрагент')->setValue(json_encode($result));
+            $lead->cf('ОРД Контрагент')->setValue(json_encode($result, JSON_UNESCAPED_UNICODE));
             $lead->save();
 
             return true;
