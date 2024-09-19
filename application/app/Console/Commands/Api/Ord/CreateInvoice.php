@@ -4,6 +4,7 @@ namespace App\Console\Commands\Api\Ord;
 
 use App\Models\Account;
 use App\Models\Api\Ord\Contract;
+use App\Models\Api\Ord\Creative;
 use App\Models\Api\Ord\Pad;
 use App\Models\Api\Ord\Person;
 use App\Models\Api\Ord\Transaction;
@@ -64,10 +65,15 @@ class CreateInvoice extends Command
                 ->where('name', $name)
                 ->first();
 
+            $creative = Creative::query()
+                ->where('contract_external_id', $contract->uuid)
+                ->first();
+
             $personUuid = $searchPerson->uuid;
             $padUuid  = $searchPad->uuid;
             $contractUuid   = $contract->uuid;
             $contractSerial = $contract->contract_serial;
+            $creativeUuid = $creative->uuid;
 
             $transaction = Transaction::query()
                 ->create([
@@ -77,13 +83,15 @@ class CreateInvoice extends Command
                     'person_uuid' => $personUuid,
                     'contract_uuid' => $contractUuid,
                     'contract_serial' => $contractSerial,
-                    'pad_uuid' => $padUuid
+                    'pad_uuid' => $padUuid,
+                    'creative_uuid' => $creativeUuid,
                 ]);
 
         } else {
 
             $contractUuid   = $transaction->contract_uuid;
             $contractSerial = $transaction->contract_serial;
+            $creativeUuid   = $transaction->creative_uuid;
         }
 
         $invoice = $ordApi->invoice();
@@ -104,7 +112,7 @@ class CreateInvoice extends Command
         $invoice->contractor_role = 'publisher';
         $invoice->serial = $contractSerial;
 
-        $invoice->creative_external_id = $transaction->creative_uuid;
+        $invoice->creative_external_id = $creativeUuid;
         $invoice->pad_external_id = $padUuid;
         $invoice->date_start_planned = $dateStart;
         $invoice->date_end_planned = $dateEndPlan;
@@ -114,7 +122,7 @@ class CreateInvoice extends Command
         $invoice->invoice_shows_count = $lead->cf('Количество показов')->getValue() * 1000;
 
         $invoice->pad_external_id = $padUuid;
-        $invoice->creative_external_id = $transaction->creative_uuid;
+        $invoice->creative_external_id = $creativeUuid;
         $invoice->date_start_planned = $date;
         $invoice->date_end_planned  = $dateEndPlan;
         $invoice->date_start_actual = $dateStart;
@@ -134,6 +142,9 @@ class CreateInvoice extends Command
             $transaction->save();
 
             Notes::addOne($lead, 'Успешное создание акта : '.$transaction->invoice_uuid);
+
+            $lead->cf('ОРД Акт')->setValue(json_encode($result, JSON_UNESCAPED_UNICODE));
+            $lead->save();
 
         } else
             Notes::addOne($lead, 'Произошла ошибка при создании акта : '.$result ? json_encode($result->error, JSON_UNESCAPED_UNICODE) : 'Неизвестная ошибка');
