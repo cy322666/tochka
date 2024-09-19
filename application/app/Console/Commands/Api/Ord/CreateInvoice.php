@@ -96,11 +96,11 @@ class CreateInvoice extends Command
 
         $invoice = $ordApi->invoice();
 
-        $date = Carbon::parse($lead->cf('Дата рекламы')->getValue())->format('Y-m-d') ?? Carbon::now()->format('Y-m-d');
-        $dateExpose = Carbon::parse($lead->cf('Дата выставления (акта)')->getValue())->format('Y-m-d') ?? Carbon::now()->format('Y-m-d');
-        $dateStart = Carbon::parse($lead->cf('Дата рекламы факт')->getValue())->format('Y-m-d') ?? Carbon::now()->format('Y-m-d');
-        $dateEnd = Carbon::parse($lead->cf('Дата окончания факт')->getValue())->format('Y-m-d') ?? Carbon::now()->format('Y-m-d');
-        $dateEndPlan = Carbon::parse($lead->cf('Дата окончания план')->getValue())->format('Y-m-d') ?? Carbon::now()->format('Y-m-d');
+        $date = Carbon::parse($lead->cf('Дата рекламы')->getValue())->format('Y-m-d') ?: Carbon::now()->format('Y-m-d');
+        $dateExpose = Carbon::parse($lead->cf('Дата выставления (акта)')->getValue())->format('Y-m-d') ?: Carbon::now()->format('Y-m-d');
+        $dateStart = Carbon::parse($lead->cf('Дата рекламы факт')->getValue())->format('Y-m-d') ?: Carbon::now()->format('Y-m-d');
+        $dateEnd = Carbon::parse($lead->cf('Дата окончания факт')->getValue())->format('Y-m-d') ?: Carbon::now()->format('Y-m-d');
+        $dateEndPlan = Carbon::parse($lead->cf('Дата окончания план')->getValue())->format('Y-m-d') ?: Carbon::now()->format('Y-m-d');
 
         $invoice->uuid = Uuid::uuid4();
         $invoice->contract_external_id = $contractUuid;
