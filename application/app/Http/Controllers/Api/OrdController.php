@@ -33,7 +33,7 @@ class OrdController extends Controller
             ->first();
 
         Artisan::call('ord:create-invoice',  [
-            'transaction' => $transaction->id,
+            'transaction' => $transaction->id ?: null,
             'lead_id' => $request->leads['status'][0]['id'],
         ]);
     }
