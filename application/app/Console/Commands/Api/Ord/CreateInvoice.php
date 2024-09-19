@@ -13,6 +13,7 @@ use App\Services\amoCRM\Models\Notes;
 use App\Services\Ord\OrdService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use Ramsey\Uuid\Uuid;
 
 class CreateInvoice extends Command
@@ -92,11 +93,12 @@ class CreateInvoice extends Command
             $contractUuid   = $transaction->contract_uuid;
             $contractSerial = $transaction->contract_serial;
             $creativeUuid   = $transaction->creative_uuid;
+            $padUuid = $transaction->pad_uuid;
         }
 
         $invoice = $ordApi->invoice();
 
-        $date = Carbon::parse($lead->cf('Дата рекламы')->getValue())->format('Y-m-d') ?: Carbon::now()->format('Y-m-d');
+        $date = Carbon::parse($lead->cf('Дата рекламы план')->getValue())->format('Y-m-d') ?: Carbon::now()->format('Y-m-d');
         $dateExpose = Carbon::parse($lead->cf('Дата выставления (акта)')->getValue())->format('Y-m-d') ?: Carbon::now()->format('Y-m-d');
         $dateStart = Carbon::parse($lead->cf('Дата рекламы факт')->getValue())->format('Y-m-d') ?: Carbon::now()->format('Y-m-d');
         $dateEnd = Carbon::parse($lead->cf('Дата окончания факт')->getValue())->format('Y-m-d') ?: Carbon::now()->format('Y-m-d');
@@ -118,7 +120,6 @@ class CreateInvoice extends Command
         $invoice->date_end_planned = $dateEndPlan;
         $invoice->date_start_actual = $dateStart;
         $invoice->date_end_actual = $dateEnd;
-        $invoice->amount_per_event = $lead->sale / $lead->cf('Количество показов')->getValue();
         $invoice->invoice_shows_count = $lead->cf('Количество показов')->getValue() * 1000;
 
         $invoice->pad_external_id = $padUuid;
@@ -129,12 +130,15 @@ class CreateInvoice extends Command
         $invoice->date_end_actual   = $dateEnd;
         $invoice->invoice_shows_count = $lead->cf('Количество показов')->getValue();
         $invoice->shows_count = $lead->cf('Количество показов')->getValue();
-        $invoice->amount = $lead->sale;
-        $invoice->amount_per_event = $invoice->amount / $invoice->shows_count;
+        $invoice->amount = $lead->sale;;
+        $invoice->amount_per_event =  round($invoice->amount / $invoice->shows_count, 3);
 
-        $invoice->create();
+        $result = $invoice->create();
 
-        $result = $invoice->add();//TODO куда крепить
+        $lead->cf('ОРД Акт')->setValue(json_encode($result, JSON_UNESCAPED_UNICODE));
+        $lead->save();
+
+        $result = $invoice->add();
 
         if (empty($result->error)) {
 
@@ -143,10 +147,11 @@ class CreateInvoice extends Command
 
             Notes::addOne($lead, 'Успешное создание акта : '.$transaction->invoice_uuid);
 
-            $lead->cf('ОРД Акт')->setValue(json_encode($result, JSON_UNESCAPED_UNICODE));
-            $lead->save();
+        } else {
 
-        } else
-            Notes::addOne($lead, 'Произошла ошибка при создании акта : '.$result ? json_encode($result->error, JSON_UNESCAPED_UNICODE) : 'Неизвестная ошибка');
+            Notes::addOne($lead, 'Произошла ошибка при создании акта');
+
+            Log::error(__METHOD__, [$result ? $result->error : 'Неизвестная ошибка']);
+        }
     }
 }
