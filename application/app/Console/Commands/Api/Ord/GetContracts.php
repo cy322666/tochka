@@ -30,7 +30,7 @@ class GetContracts extends Command
     {
         $contracts = (new OrdService(env('APP_ENV')))->contract()->list();
 
-        if (count($contracts) !== Contract::query()->count()) {
+//        if (count($contracts) !== Contract::query()->count()) {
 
             foreach ($contracts as $contract) {
 
@@ -57,6 +57,6 @@ class GetContracts extends Command
                     dump($e->getMessage().' '.$e->getFile().' '.$e->getLine());
                 }
             }
-        }
+//        }
     }
 }

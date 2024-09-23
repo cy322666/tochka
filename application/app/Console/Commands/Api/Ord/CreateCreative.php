@@ -104,7 +104,7 @@ class CreateCreative extends Command
 
             Notes::addOne($lead, 'Успешная загрузка медиа : '.$transaction->media);
 
-            $lead->cf('ОРД Медиа')->setValue(json_encode($result, JSON_UNESCAPED_UNICODE));
+            $lead->cf('ОРД Медиа')->setValue($result, JSON_UNESCAPED_UNICODE);
             $lead->save();
 
         } catch (\Throwable $e) {

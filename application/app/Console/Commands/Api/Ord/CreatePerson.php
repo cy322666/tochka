@@ -60,9 +60,9 @@ class CreatePerson extends Command
             $person->role  = 'publisher';
             $result = $person->create();
 
-            $person = $ordApi->person()->get($person->uuid);
+            $personNew = $ordApi->person()->get($person->uuid);
 
-            if ($person && empty($result->error)) {
+            if ($personNew && empty($result->error)) {
 
                 $transaction->person_uuid = $person->uuid;
                 $transaction->save();

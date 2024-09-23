@@ -154,7 +154,9 @@ class CreateContract extends Command
                     ' Заявка : '.$contract->uuid.' , '.$contract->serial,
                 ]));
 
-                $lead->cf('ОРД Заявка')->setValue(json_encode($result, JSON_UNESCAPED_UNICODE));
+                $contract = $ordApi->contract()->get($contract->uuid);
+
+                $lead->cf('ОРД Заявка')->setValue(json_encode($contract, JSON_UNESCAPED_UNICODE));
                 $lead->save();
 
                 return true;

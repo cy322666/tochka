@@ -32,7 +32,7 @@ class GetCreative extends Command
     {
         $creatives = (new OrdService(env('APP_ENV')))->creative()->list();
 
-        if (count($creatives) !== Creative::query()->count()) {
+//        if (count($creatives) !== Creative::query()->count()) {
 
             foreach ($creatives as $creative) {
 
@@ -56,7 +56,7 @@ class GetCreative extends Command
                 } catch (\Throwable $e) {
                     dump($e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine());
                 }
-            }
+//            }
         }
     }
 }
