@@ -76,6 +76,18 @@ class CreatePerson extends Command
                 $transaction->contact_id = $lead->contact->id;
                 $transaction->save();
 
+                Person::query()->create([
+                    'uuid' => $person->uuid,
+                    'juridical_details' => json_encode($personNew->juridical_details) ?: null,
+                    'create_date' => $personNew->create_date,
+                    'name'  => $personNew->name ?: null,
+                    'roles' => json_encode($personNew->roles) ?: null,
+                    'type'  => $personNew->juridical_details->type ?: null,
+                    'phone' => $personNew->juridical_details->phone ?: null,
+                    'inn'   => $personNew->juridical_details->inn ?: null,
+//                          'rs_url' => $detail->juridical_details->rs_url ?? null,
+                ]);
+
                 return true;
 
             } else {
