@@ -34,7 +34,7 @@ class OrdController extends Controller
         if ($result3)
             $result4 = Artisan::call('ord:create-creative', ['transaction' => $transaction->id]);
 
-        Log::debug('ord:create-creative : '.$transaction->id.' > '.$result4);
+        Log::debug('ord:create-creative : '.$transaction->id.' > '.!empty($result4) ? $result4 : null);
     }
 
     public function invoice(Request $request)
