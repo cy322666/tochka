@@ -34,16 +34,11 @@ class Creative
             "okveds" => [$this->okveds],
             "name" => $this->name,
             "brand" => $this->brand,
-//                "category" => $this->category,
-//                "description" => $this->description,
             "pay_type" => $this->pay_type,
             "form" => $this->form,
-//                "targeting" => $this->targeting,
-//            "url" => $this->target_urls,
             "url" => $this->url,
-            "texts" => $this->texts,
-            "media_external_ids" => $this->media_external_ids,
-//            "media_urls" => $this->media_urls,
+//            "texts" => $this->texts,
+//            "media_external_ids" => $this->media_external_ids,
         ];
 
         Log::debug(__METHOD__, $body);

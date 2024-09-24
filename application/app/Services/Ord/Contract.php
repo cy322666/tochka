@@ -15,7 +15,7 @@ class Contract
     public string $serial;
 //    public string $action_type;
     public string $subject_type;
-    public string $parent_contract_external_id;
+    public ?string $parent_contract_external_id = null;
 //    public string $amount;//"500.5"
 
     public function __construct(public OrdService $service) {}
@@ -30,7 +30,7 @@ class Contract
                 "date" => $this->date,
                 "serial" => $this->serial,
                 "subject_type" => $this->subject_type,
-                "parent_contract_external_id" => $this->parent_contract_external_id ?? null,
+                "parent_contract_external_id" => $this->parent_contract_external_id,
             ])->object();
     }
 
@@ -43,7 +43,9 @@ class Contract
 
     public function list(): array
     {
-        for ($offset = 0, $limit = 100, $persons = [] ; ; $offset += $limit) {
+        $limit = \App\Models\Api\Ord\Contract::query()->count();
+
+        for ($limit -= 500, $persons = [] ; ; $offset += $limit) {
 
             $response = Http::withHeaders($this->service->getHeaders())
                 ->get($this->service::$baseUrl.'/v1/contract', [

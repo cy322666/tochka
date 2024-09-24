@@ -88,18 +88,19 @@ class Order extends Model
                 //активная в сервисе и оплаченный заказ -> инициализация
                 self::SERVICE_PIPELINE_ID => self::PAY_SERVICE_STATUS_ID,
                 //активная в допродажах и оплаченный заказ -> оставляем как есть
-                self::DOP_PIPELINE_ID => $lead->pipeline_id,
-                self::EXT_PIPELINE_ID => $lead->pipeline_id,
+                self::DOP_PIPELINE_ID => $lead->status_id,
+                self::EXT_PIPELINE_ID => $lead->status_id,
             };
 
         if ($this->status_order == 'Отменен')
 
             return match ($lead->pipeline_id) {
                 //активная и отмена -> закрываем в нереализ
-                self::OP_PIPELINE_ID, self::KVAL_PIPELINE_ID, self::SERVICE_PIPELINE_ID => 143,
+                self::OP_PIPELINE_ID, self::KVAL_PIPELINE_ID => 143,
 
-                self::DOP_PIPELINE_ID => $lead->pipeline_id,
-                self::EXT_PIPELINE_ID => $lead->pipeline_id,
+                self::SERVICE_PIPELINE_ID => $lead->status_id,
+                self::DOP_PIPELINE_ID => $lead->status_id,
+                self::EXT_PIPELINE_ID => $lead->status_id,
             };
     }
 
@@ -118,9 +119,10 @@ class Order extends Model
 
             return self::PAY_SERVICE_STATUS_ID;
 
-        if ($this->status_order == 'Отменен')
+        if ($this->status_order == 'Отменен') {
 
             return 143;
+        }
     }
 
     public function matchStatusNoSuccess()
@@ -137,9 +139,10 @@ class Order extends Model
 
             return self::PAY_OP_STATUS_ID;
 
-        if ($this->status_order == 'Отменен')
+        if ($this->status_order == 'Отменен') {
 
             return 143;
+        }
     }
 
     public function createLead($contact, int $statusId, int $pipelineId)
