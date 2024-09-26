@@ -45,7 +45,7 @@ class Contract
     {
         $limit = \App\Models\Api\Ord\Contract::query()->count();
 
-        for ($limit -= 500, $persons = [] ; ; $offset += $limit) {
+        for ($limit -= 500, $persons = [], $offset = 0 ; ; $offset += $limit) {
 
             $response = Http::withHeaders($this->service->getHeaders())
                 ->get($this->service::$baseUrl.'/v1/contract', [
