@@ -11,7 +11,7 @@ class Pad
     public string $url;
     public string $name;
     public string $type;
-    public string $is_owner;
+    public bool $is_owner = false;
     public string $person_external_id;
     public string $create_date;
 
@@ -23,7 +23,7 @@ class Pad
             ->put($this->service::$baseUrl.'/v1/pad/'.$this->uuid, [
 //                "create_date" => $this->create_date,
                 "person_external_id" => $this->person_external_id,
-                "is_owner" => (boolean)$this->is_owner,
+                "is_owner" => $this->is_owner,
                 "type" => $this->type,
                 "name" => $this->name,
                 "url" => $this->url,
