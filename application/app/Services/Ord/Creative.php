@@ -37,8 +37,8 @@ class Creative
             "pay_type" => $this->pay_type,
             "form" => $this->form,
             "url" => $this->url,
-//            "texts" => $this->texts,
-//            "media_external_ids" => $this->media_external_ids,
+            "texts" => $this->texts,
+            "media_external_ids" => $this->media_external_ids,
         ];
 
         Log::debug(__METHOD__, $body);
