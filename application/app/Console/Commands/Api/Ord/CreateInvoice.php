@@ -91,6 +91,10 @@ class CreateInvoice extends Command
 
         } else {
 
+            $searchPerson = Person::query()
+                ->where('uuid', $transaction->person_uuid)
+                ->first();
+
             $searchPad = Pad::query()
                 ->where('person_external_id', $searchPerson->uuid)
                 ->where('name', $name)
