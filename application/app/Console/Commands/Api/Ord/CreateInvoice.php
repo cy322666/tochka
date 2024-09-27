@@ -51,6 +51,9 @@ class CreateInvoice extends Command
 
         if (!$transaction) {
 
+            $company = $lead->company;
+            $contact = $lead->contact;
+
             $searchPerson = Person::query()
                 ->where('inn', $company->cf('ИНН')->getValue())
                 ->first();
@@ -60,6 +63,8 @@ class CreateInvoice extends Command
                 ->where('type', '!=', 'service')
                 ->latest('created_at')
                 ->first();
+
+            $name = $lead->pipeline_id == CreatePad::IG_PIPELINE_ID ? $contact->cf('Ник блогера')->getValue() : $contact->cf('Название канала')->getValue();
 
             $searchPad = Pad::query()
                 ->where('person_external_id', $searchPerson->uuid)
@@ -83,7 +88,7 @@ class CreateInvoice extends Command
                     'company_id' => $lead->company->id,
                     'person_uuid' => $personUuid,
                     'contract_uuid' => $contractUuid,
-                    'contract_serial' => $contractSerial,
+                    'contract_serial' => $lead->cf('Номер заявки')->getValue(),
                     'pad_uuid' => $padUuid,
                     'creative_uuid' => $creativeUuid,
                 ]);
@@ -112,7 +117,7 @@ class CreateInvoice extends Command
         $invoice->amount = $lead->sale;
         $invoice->client_role = 'advertiser';
         $invoice->contractor_role = 'publisher';
-        $invoice->serial = $contractSerial;
+        $invoice->serial = $lead->cf('Номер заявки')->getValue();
 
         $invoice->creative_external_id = $creativeUuid;
         $invoice->pad_external_id = $padUuid;
