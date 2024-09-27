@@ -13,6 +13,7 @@ use App\Services\amoCRM\Models\Notes;
 use App\Services\Ord\OrdService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use Ramsey\Uuid\Uuid;
 
@@ -53,6 +54,14 @@ class CreateInvoice extends Command
 
         if (!$transaction) {
 
+            $transaction = Transaction::query()
+                ->create([
+                    'lead_id' => $lead->id,
+                    'contact_id' => $lead->contact->id,
+                    'company_id' => $lead->company->id,
+                    'contract_serial' => $lead->cf('Номер заявки')->getValue(),
+                ]);
+
             $searchPerson = Person::query()
                 ->where('inn', $lead->company->cf('ИНН')->getValue())
                 ->first();
@@ -68,32 +77,40 @@ class CreateInvoice extends Command
                 ->where('name', $name)
                 ->first();
 
+            $transaction->person_uuid = $searchPerson?->uuid;
+            $transaction->contract_uuid = $contract?->uuid;
+            $transaction->save();
+
+            if (!$searchPad) {
+
+                Notes::addOne($lead, 'Ошибка: Заведен вручную, у контрагента не найдена площадка'.PHP_EOL.' Название : '.$name.PHP_EOL.' Контрагент : '.$searchPerson->uuid);
+
+                $result3 = Artisan::call('ord:create-pad',      ['transaction' => $transaction->id]);
+
+                if (!$result3)
+                    return false;
+            }
+
             $creative = Creative::query()
                 ->where('contract_external_id', $contract->uuid)
                 ->first();
+
+            $transaction->pad_uuid = $creative?->uuid;
+            $transaction->creative_uuid = $creative?->uuid;
+            $transaction->save();
 
             $personUuid = $searchPerson->uuid;
             $padUuid  = $searchPad->uuid;
             $contractUuid   = $contract->uuid;
             $creativeUuid = $creative->uuid;
 
-            $transaction = Transaction::query()
-                ->create([
-                    'lead_id' => $lead->id,
-                    'contact_id' => $lead->contact->id,
-                    'company_id' => $lead->company->id,
-                    'person_uuid' => $personUuid,
-                    'contract_uuid' => $contractUuid,
-                    'contract_serial' => $lead->cf('Номер заявки')->getValue(),
-                    'pad_uuid' => $padUuid,
-                    'creative_uuid' => $creativeUuid,
-                ]);
-
         } else {
 
             $searchPerson = Person::query()
                 ->where('uuid', $transaction->person_uuid)
                 ->first();
+
+            Log::debug(__METHOD__.' : pad name for search '.$name);
 
             $searchPad = Pad::query()
                 ->where('person_external_id', $searchPerson->uuid)
