@@ -3,6 +3,7 @@
 namespace App\Services\Ord;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Ramsey\Uuid\Uuid;
 
 class Invoice
@@ -31,41 +32,22 @@ class Invoice
 
     public function create(): ?object
     {
+        $body = [
+            "contract_external_id" => $this->contract_external_id,
+            "date" => $this->date,
+            "serial" => $this->serial,
+            "date_start" => $this->date_start,
+            "date_end" => $this->date_end,
+            "amount" => $this->amount,
+            "client_role" => $this->client_role,
+            "contractor_role" => $this->contractor_role,
+            "flags" => ["vat_included"],
+        ];
+
+        Log::debug(__METHOD__, $body);
+
         return Http::withHeaders($this->service->getHeaders())
-            ->put($this->service::$baseUrl . '/v2/invoice/' . $this->uuid.'/header', [
-                "contract_external_id" => $this->contract_external_id,
-                "date" => $this->date,
-                "serial" => $this->serial,
-                "date_start" => $this->date_start,
-                "date_end" => $this->date_end,
-                "amount" => $this->amount,
-                "client_role" => $this->client_role,
-                "contractor_role" => $this->contractor_role,
-                "flags" => ["vat_included"],
-//                'items' => [
-//                    [
-//                        "contract_external_id" => $this->contract_external_id,
-//                        "amount" => $this->amount,
-//                        'creatives' => [
-//                            "creative_external_id" => $this->creative_external_id,
-//                            "platforms" => [
-//                                [
-//                                    "pad_external_id" => $this->pad_external_id,
-//                                    "shows_count" => $this->shows_count,
-//                                    "invoice_shows_count" => $this->shows_count,
-//                                    "amount" => $this->amount,
-//                                    "amount_per_event" => $this->amount_per_event,
-//                                    "date_start_planned" => $this->date_start,
-//                                    "date_end_planned"   => $this->date_end_planned,
-//                                    "date_start_actual"  => $this->date_start_actual,
-//                                    "date_end_actual"    => $this->date_end_actual,
-//                                    "pay_type" => "cpm",
-//                                ]
-//                            ]
-//                        ]
-//                    ]
-//                ]
-            ])->object();
+            ->put($this->service::$baseUrl . '/v2/invoice/' . $this->uuid.'/header', $body)->object();
     }
 
     public function get(string $id)
