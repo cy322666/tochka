@@ -110,7 +110,7 @@ class CreateInvoice extends Command
         $invoice->date_start = $dateStart;
         $invoice->date_end = $dateEnd;
         $invoice->amount = $lead->sale;
-        $invoice->client_role = 'agency';
+        $invoice->client_role = 'advertiser';
         $invoice->contractor_role = 'publisher';
         $invoice->serial = $contractSerial;
 
@@ -138,7 +138,7 @@ class CreateInvoice extends Command
         $lead->cf('ОРД Акт')->setValue(json_encode($result, JSON_UNESCAPED_UNICODE));
         $lead->save();
 
-        $result = $invoice->add();
+//        $result = $invoice->add();
 
         if (empty($result->error)) {
 
