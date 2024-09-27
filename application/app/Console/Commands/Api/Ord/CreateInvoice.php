@@ -135,10 +135,12 @@ class CreateInvoice extends Command
 
         $result = $invoice->create();
 
-        $lead->cf('ОРД Акт')->setValue(json_encode($result, JSON_UNESCAPED_UNICODE));
-        $lead->save();
+        try {
+            $lead->cf('ОРД Акт')->setValue(json_encode($result, JSON_UNESCAPED_UNICODE));
+            $lead->save();
+        } catch (\Throwable $e) {}
 
-//        $result = $invoice->add();
+        $result = $invoice->add();
 
         if (empty($result->error)) {
 
