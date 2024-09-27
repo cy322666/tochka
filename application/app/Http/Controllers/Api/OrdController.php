@@ -45,7 +45,7 @@ class OrdController extends Controller
 
         Artisan::call('ord:create-invoice',  [
             'lead_id' => $request->leads['status'][0]['id'],
-            'transaction' => $transaction->id ?: null,
+            'transaction' => $transaction?->id,
         ]);
     }
 }
