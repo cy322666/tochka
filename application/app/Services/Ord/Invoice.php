@@ -41,6 +41,7 @@ class Invoice
                 "amount" => $this->amount,
                 "client_role" => $this->client_role,
                 "contractor_role" => $this->contractor_role,
+                "flags" => ["vat_included"],
 //                'items' => [
 //                    [
 //                        "contract_external_id" => $this->contract_external_id,

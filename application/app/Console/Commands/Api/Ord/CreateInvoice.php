@@ -49,13 +49,12 @@ class CreateInvoice extends Command
 
         $lead = $amoApi->service->leads()->find($this->argument('lead_id'));
 
+        $name = $lead->pipeline_id == CreatePad::IG_PIPELINE_ID ? $lead->contact->cf('Ник блогера')->getValue() : $lead->contact->cf('Название канала')->getValue();
+
         if (!$transaction) {
 
-            $company = $lead->company;
-            $contact = $lead->contact;
-
             $searchPerson = Person::query()
-                ->where('inn', $company->cf('ИНН')->getValue())
+                ->where('inn', $lead->company->cf('ИНН')->getValue())
                 ->first();
 
             $contract = Contract::query()
@@ -63,8 +62,6 @@ class CreateInvoice extends Command
                 ->where('type', '!=', 'service')
                 ->latest('created_at')
                 ->first();
-
-            $name = $lead->pipeline_id == CreatePad::IG_PIPELINE_ID ? $contact->cf('Ник блогера')->getValue() : $contact->cf('Название канала')->getValue();
 
             $searchPad = Pad::query()
                 ->where('person_external_id', $searchPerson->uuid)
@@ -78,7 +75,6 @@ class CreateInvoice extends Command
             $personUuid = $searchPerson->uuid;
             $padUuid  = $searchPad->uuid;
             $contractUuid   = $contract->uuid;
-            $contractSerial = $contract->contract_serial;
             $creativeUuid = $creative->uuid;
 
             $transaction = Transaction::query()
@@ -95,19 +91,23 @@ class CreateInvoice extends Command
 
         } else {
 
+            $searchPad = Pad::query()
+                ->where('person_external_id', $searchPerson->uuid)
+                ->where('name', $name)
+                ->first();
+
             $contractUuid   = $transaction->contract_uuid;
-            $contractSerial = $transaction->contract_serial;
             $creativeUuid   = $transaction->creative_uuid;
-            $padUuid = $transaction->pad_uuid;
+            $padUuid = $searchPad->uuid;
         }
 
         $invoice = $ordApi->invoice();
 
-        $date = Carbon::parse($lead->cf('Дата рекламы план')->getValue())->format('Y-m-d') ?: Carbon::now()->format('Y-m-d');
-        $dateExpose = Carbon::parse($lead->cf('Дата выставления (акта)')->getValue())->format('Y-m-d') ?: Carbon::now()->format('Y-m-d');
-        $dateStart = Carbon::parse($lead->cf('Дата рекламы факт')->getValue())->format('Y-m-d') ?: Carbon::now()->format('Y-m-d');
-        $dateEnd = Carbon::parse($lead->cf('Дата окончания факт')->getValue())->format('Y-m-d') ?: Carbon::now()->format('Y-m-d');
-        $dateEndPlan = Carbon::parse($lead->cf('Дата окончания план')->getValue())->format('Y-m-d') ?: Carbon::now()->format('Y-m-d');
+        $date = Carbon::parse($lead->cf('Дата рекламы план')->getValue())->format('Y-m-d');
+        $dateExpose = Carbon::parse($lead->cf('Дата выставления (акта)')->getValue())->format('Y-m-d');
+        $dateStart = Carbon::parse($lead->cf('Дата рекламы факт')->getValue())->format('Y-m-d');
+        $dateEnd = Carbon::parse($lead->cf('Дата окончания факт')->getValue())->format('Y-m-d');
+        $dateEndPlan = Carbon::parse($lead->cf('Дата окончания план')->getValue())->format('Y-m-d');
 
         $invoice->uuid = Uuid::uuid4();
         $invoice->contract_external_id = $contractUuid;
