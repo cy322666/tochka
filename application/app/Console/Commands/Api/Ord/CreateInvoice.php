@@ -85,11 +85,16 @@ class CreateInvoice extends Command
 
                 Notes::addOne($lead, 'Ошибка: Заведен вручную, у контрагента не найдена площадка'.PHP_EOL.' Название : '.$name.PHP_EOL.' Контрагент : '.$searchPerson->uuid);
 
-                $result3 = Artisan::call('ord:create-pad',      ['transaction' => $transaction->id]);
+                $result3 = Artisan::call('ord:create-pad', ['transaction' => $transaction->id]);
 
                 if (!$result3)
                     return false;
             }
+
+            $searchPad = Pad::query()
+                ->where('person_external_id', $searchPerson->uuid)
+                ->where('name', $name)
+                ->first();
 
             $creative = Creative::query()
                 ->where('contract_external_id', $contract->uuid)
@@ -111,6 +116,22 @@ class CreateInvoice extends Command
                 ->first();
 
             Log::debug(__METHOD__.' : pad name for search '.$name);
+
+            $searchPad = Pad::query()
+                ->where('person_external_id', $searchPerson->uuid)
+                ->where('name', $name)
+                ->first();
+
+            if (!$searchPad) {
+
+                Notes::addOne($lead, 'Ошибка: Заведен вручную, у контрагента не найдена площадка'.PHP_EOL.' Название : '.$name.PHP_EOL.' Контрагент : '.$searchPerson->uuid);
+
+                $result3 = Artisan::call('ord:create-pad', ['transaction' => $transaction->id]);
+
+                if (!$result3)
+
+                    return false;
+            }
 
             $searchPad = Pad::query()
                 ->where('person_external_id', $searchPerson->uuid)
@@ -166,7 +187,7 @@ class CreateInvoice extends Command
             $lead->save();
         } catch (\Throwable $e) {}
 
-        $result = $invoice->add();
+//        $result = $invoice->add();
 
         if (empty($result->error)) {
 

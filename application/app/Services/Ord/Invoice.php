@@ -42,12 +42,35 @@ class Invoice
             "client_role" => $this->client_role,
             "contractor_role" => $this->contractor_role,
             "flags" => ["vat_included"],
+            "items" => [[
+                "contract_external_id" => $this->contract_external_id,
+                "amount" => $this->amount,
+                "flags" => ["vat_included"],
+                "creatives" => [
+                    [
+                        "creative_external_id" => $this->creative_external_id,
+                        "platforms" => [[
+                            "pad_external_id"  => $this->pad_external_id,
+                            "amount_per_event" => (string)$this->amount_per_event,
+                            "invoice_shows_count" => (float)$this->invoice_shows_count,
+                            "shows_count" => (int)$this->shows_count,
+                            "amount" => $this->amount,
+                            "date_start_planned" => $this->date_start_planned,
+                            "date_end_planned"   => $this->date_end_planned,
+                            "date_start_actual"  => $this->date_start_actual,
+                            "date_end_actual" => $this->date_end_actual,
+                            "pay_type" => "cpm"
+                        ]]
+                        ]
+                    ]
+                ]
+            ]
         ];
 
         Log::debug(__METHOD__, $body);
 
         return Http::withHeaders($this->service->getHeaders())
-            ->put($this->service::$baseUrl . '/v2/invoice/' . $this->uuid.'/header', $body)->object();
+            ->put($this->service::$baseUrl . '/v1/invoice/' . $this->uuid, $body)->object();
     }
 
     public function get(string $id)
