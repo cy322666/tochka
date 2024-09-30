@@ -100,7 +100,17 @@ class CreateInvoice extends Command
                 ->where('contract_external_id', $contract->uuid)
                 ->first();
 
-            $transaction->pad_uuid = $creative?->uuid;
+            if (!$creative) {
+
+                if ($transaction->erid) {
+
+                    $creative = Creative::query()
+                        ->where('erid', $transaction->erid)
+                        ->first();
+                }
+            }
+
+            $transaction->pad_uuid = $searchPad?->uuid;
             $transaction->creative_uuid = $creative?->uuid;
             $transaction->save();
 
@@ -114,8 +124,6 @@ class CreateInvoice extends Command
             $searchPerson = Person::query()
                 ->where('uuid', $transaction->person_uuid)
                 ->first();
-
-            Log::debug(__METHOD__.' : pad name for search '.$name);
 
             $searchPad = Pad::query()
                 ->where('person_external_id', $searchPerson->uuid)
@@ -135,10 +143,51 @@ class CreateInvoice extends Command
 
             $transaction->refresh();
 
+            if (!$transaction->creative_uuid) {
+
+                if (!$transaction->erid) {
+
+                    Notes::addOne($lead, 'Ошибка: Не указан uuid креатива');
+
+                    return false;
+                } else {
+
+                    $creative = Creative::query()
+                        ->where('erid', $transaction->erid)
+                        ->first();
+
+                    if (!$creative) {
+
+                        Notes::addOne($lead, 'Ошибка: Не указан uuid креатива и не найден по erid');
+
+                        return false;
+                    }
+                }
+
+                $creativeUuid = $creative->uuid;
+            } else
+                $creativeUuid   = $transaction->creative_uuid;
+
             $contractUuid   = $transaction->contract_uuid;
-            $creativeUuid   = $transaction->creative_uuid;
             $padUuid = $transaction->pad_uuid;
         }
+
+        $pad = $ordApi->pad()->get($padUuid);
+
+        if (!$pad) {
+
+            Notes::addOne($lead, 'Ошибка: по uuid не нашли площадку в ОРД : '.$padUuid);
+
+            $result = Artisan::call('ord:create-pad', ['transaction' => $transaction->refresh()->id]);
+
+            if (!$result) {
+
+                return false;
+            }
+            $padUuid = $transaction->pad_uuid;
+        }
+
+        $transaction->refresh();
 
         $invoice = $ordApi->invoice();
 
