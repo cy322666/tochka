@@ -133,14 +133,11 @@ class CreateInvoice extends Command
                     return false;
             }
 
-            $searchPad = Pad::query()
-                ->where('person_external_id', $searchPerson->uuid)
-                ->where('name', $name)
-                ->first();
+            $transaction->refresh();
 
             $contractUuid   = $transaction->contract_uuid;
             $creativeUuid   = $transaction->creative_uuid;
-            $padUuid = $searchPad->uuid;
+            $padUuid = $transaction->pad_uuid;
         }
 
         $invoice = $ordApi->invoice();
