@@ -42,7 +42,7 @@ class SearchCount extends Command
         ]);
 
         Http::post('https://h.albato.ru/wh/38/1lfh5q5/xTnl50b85iCsp9oFCfk9UL2N8iFZPTdZEEbAdNBGVeU/', [
-            'name' => $link->name,
+            'name' => trim($link->name),
             'lead_id' => $this->argument('lead_id'),
         ]);
     }
