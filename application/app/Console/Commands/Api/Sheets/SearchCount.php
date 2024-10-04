@@ -30,11 +30,13 @@ class SearchCount extends Command
     {
         $url = substr($this->argument('url'), 0, 22).'...';
 
+        Log::debug(__METHOD__.' url : '.$url);
+
         $link = Link::query()
             ->where('url', $url)
             ->first();
 
-        Log::info(__METHOD__, [
+        Log::info(__METHOD__.' searched : ', [
             'name' => $link->name,
             'lead_id' => $this->argument('lead_id'),
         ]);
