@@ -18,19 +18,18 @@ class SheetsController extends Controller
     public function links(Request $request)
     {
         Link::query()->updateOrCreate([
-            'url' => $request->url
+            'link_id' => $request->link_id,
         ], [
             'name' => $request->name,
-            'type' => $request->type,
-            'link_id' => $request->link_id,
+            'url' => $request->url
         ]);
     }
 
     public function hook(Request $request)
     {
-        $lastLeadId = Cache::get('last_lead_id');
+//        $lastLeadId = Cache::get('last_lead_id');
 
-        if ($lastLeadId !== $request->lead_id) {
+//        if ($lastLeadId !== $request->lead_id) {
 
             Cache::set('last_lead_id', $request->lead_id);
 
@@ -38,6 +37,6 @@ class SheetsController extends Controller
                 'lead_id' => $request->lead_id,
                 'url'  => $request->url,
             ]);
-        }
+//        }
     }
 }
