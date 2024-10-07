@@ -138,6 +138,8 @@ class CreateCreative extends Command
                 $transaction->creative_uuid = $creative->uuid;
                 $transaction->save();
 
+                $lead = $amoApi->service->leads()->find($lead->id);
+
                 Notes::addOne($lead, implode("\n", [
                     ' Успешное создание креатива : ',
                     ' erid : '.$transaction->erid,
