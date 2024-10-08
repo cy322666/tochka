@@ -20,6 +20,7 @@ abstract class NoteHelper
             'Оплачено: '.$order->payed_money. ' руб.',
             'Осталось оплатить: '.$order->left_cost_money. ' руб.',
             'Статус заказа: '.$order->status_order. ' | '. $statusPay,
+            'Ссылка на заказ: '.'https://admin.tochka-school.ru/#/order/'.str_replace('8000', '', $order->order_id),
             '',
             'Информация по клиенту',
             'Имя: '.$order->name,
