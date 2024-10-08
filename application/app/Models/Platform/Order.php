@@ -163,6 +163,8 @@ class Order extends Model
             $lead->cf('GetCourse. Осталось оплатить')->setValue($this->left_cost_money);
             $lead->cf('GetCourse. Статус заказа')->setValue($this->status_order);
 
+            $lead->cf('GetCourse. Ссылка на заказ')->setValue('https://admin.tochka-school.ru/#/order/'.str_replace('8000', '', $this->order_id));
+
         } catch (\Throwable $e) {
             Log::alert(__METHOD__.' '.$this->id, [$e->getMessage()]);
         }
@@ -186,6 +188,9 @@ class Order extends Model
             $lead->cf('GetCourse. Состав заказа')->setValue($this->positions);
             $lead->cf('GetCourse. Осталось оплатить')->setValue($this->left_cost_money);
             $lead->cf('GetCourse. Статус заказа')->setValue($this->status_order);
+
+            $lead->cf('GetCourse. Ссылка на заказ')->setValue('https://admin.tochka-school.ru/#/order/'.str_replace('8000', '', $this->order_id));
+
         } catch (\Throwable $e) {
             Log::alert(__METHOD__, [$e->getMessage()]);
         }
