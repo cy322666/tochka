@@ -44,7 +44,7 @@ class SheetsController extends Controller
             ->where('lead_id', $request->lead_id)
             ->first();
 
-        if (!$transaction) return;
+        if (!$transaction || $transaction->check_2) return;
 
         $transaction->count_2 = $request->count;
         $transaction->check_2 = $request->count !== null;
@@ -65,6 +65,11 @@ class SheetsController extends Controller
                 ['lead_id' => $request->lead_id],
                 ['url'  => $request->url]
             );
+
+        if ($transaction->check_1) {
+
+            return;
+        }
 
         Artisan::call('app:check1-count', [
             'transaction' => $transaction
