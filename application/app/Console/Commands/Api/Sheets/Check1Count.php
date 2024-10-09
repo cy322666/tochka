@@ -38,8 +38,8 @@ class Check1Count extends Command
             ->first();
 
         Log::debug(__METHOD__.' searched : ', [
-            'name' => $link->name,
-            'lead_id' => $this->argument('lead_id'),
+            'name' => $transaction->name,
+            'lead_id' => $transaction->lead_id,
         ]);
 
         $transaction->name = $link->name;
