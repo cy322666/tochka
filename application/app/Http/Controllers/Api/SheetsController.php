@@ -27,7 +27,10 @@ class SheetsController extends Controller
     public function check1(Request $request)
     {
         $transaction = Transaction::query()
-            ->firstOrFail(['lead_id' => $request->lead_id]);
+            ->where(['lead_id', $request->lead_id])
+            ->firstOr([], function () {
+                throw new \Exception('Не найдена транзакция для сделки');
+            });
 
         $transaction->count_1 = $request->count;
         $transaction->check_1 = true;
@@ -38,7 +41,10 @@ class SheetsController extends Controller
     public function check2(Request $request)
     {
         $transaction = Transaction::query()
-            ->firstOrFail(['lead_id' => $request->lead_id]);
+            ->where(['lead_id', $request->lead_id])
+            ->firstOr([], function () {
+                throw new \Exception('Не найдена транзакция для сделки');
+            });
 
         $transaction->count_2 = $request->count;
         $transaction->check_2 = $request->count !== null;
