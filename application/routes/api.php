@@ -24,15 +24,15 @@ Route::post('ord/hook', [OrdController::class, 'hook']);
 
 Route::post('ord/invoice', [OrdController::class, 'invoice']);
 
-Route::post('msg/hook', [MessagesController::class, 'hook']);
-
 Route::get('platform/orders', [PlatformController::class, 'order']);
-
-//Route::post('salesbot/filter/contects-hook', [SalesBotController::class, 'filterContecst']);
 
 Route::post('sheets/directories/links', [SheetsController::class, 'links']);//добавение ссылки в таблицу ссылок
 
 Route::post('sheets/hook', [SheetsController::class, 'hook']);//хук от альбато с ссылкой
+
+Route::post('sheets/check1', [SheetsController::class, 'check1']);//хук от альбато с данными первой проверки
+
+Route::post('sheets/check2', [SheetsController::class, 'check2']);//хук от альбато с данными второй проверки
 
 Route::post('sheets/subscribes', [SheetsController::class, 'subscribes']);//подписчики
 

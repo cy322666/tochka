@@ -7,19 +7,13 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
-    /**
-     * Define the application's command schedule.
-     */
     protected function schedule(Schedule $schedule): void
     {
-//         $schedule->command('messages:incoming')->everyFiveMinutes();
-
         $schedule->command('telescope:prune --hours=24')->daily();
 
-        $schedule->command('app:get-page-link')->everyFiveMinutes();
-//        $schedule->command('horizon:snapshot')->everyFiveMinutes();
+        $schedule->command('app:cron2-check')->dailyAt('17:00:00');
 
-//        $schedule->command('app:send-fail-cron')->everyMinute();
+        $schedule->command('app:get-page-link')->everyFiveMinutes();
 
         $schedule->command('ord:get-persons')->everyMinute();
         $schedule->command('ord:get-creative')->everyTenMinutes();

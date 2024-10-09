@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Api\Sheets\Directories\Link;
+use App\Models\Api\Sheets\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
@@ -11,10 +12,7 @@ use Illuminate\Support\Facades\Log;
 
 class SheetsController extends Controller
 {
-    public function subscribes(Request $request)
-    {
-    }
-
+    //new string table
     public function links(Request $request)
     {
         Link::query()->updateOrCreate([
@@ -25,18 +23,40 @@ class SheetsController extends Controller
         ]);
     }
 
+    //1 check count to albato
+    public function check1(Request $request)
+    {
+        $transaction = Transaction::query()
+            ->firstOrFail(['lead_id' => $request->lead_id]);
+
+        $transaction->count_1 = $request->count;
+        $transaction->check_1 = true;
+        $transaction->save();
+    }
+
+    //2 check count to albato -> cron
+    public function check2(Request $request)
+    {
+        $transaction = Transaction::query()
+            ->firstOrFail(['lead_id' => $request->lead_id]);
+
+        $transaction->count_2 = $request->count;
+        $transaction->check_2 = $request->count !== null;
+        $transaction->status  = $request->count !== null;
+        $transaction->save();
+    }
+
+    //1. hook amocrm
     public function hook(Request $request)
     {
-//        $lastLeadId = Cache::get('last_lead_id');
+        $transaction = Transaction::query()
+            ->createOrFirst(
+                ['lead_id' => $request->lead_id],
+                ['url'  => $request->url]
+            );
 
-//        if ($lastLeadId !== $request->lead_id) {
-
-            Cache::set('last_lead_id', $request->lead_id);
-
-            Artisan::call('app:search-count', [
-                'lead_id' => $request->lead_id,
-                'url'  => $request->url,
-            ]);
-//        }
+        Artisan::call('app:check1-count', [
+            'transaction' => $transaction
+        ]);
     }
 }
