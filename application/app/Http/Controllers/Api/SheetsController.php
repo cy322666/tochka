@@ -49,6 +49,11 @@ class SheetsController extends Controller
     //1. hook amocrm
     public function hook(Request $request)
     {
+        if ($request->url == 'http://-') {
+
+            return;
+        }
+
         $transaction = Transaction::query()
             ->createOrFirst(
                 ['lead_id' => $request->lead_id],
