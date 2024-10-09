@@ -29,8 +29,8 @@ class Check2Count extends Command
     {
         $transaction = $this->argument('transaction');
 
-        Http::post('https://h.albato.ru/wh/38/1lfh5q5/ymqv4-g3P2kzL58uu4SONJUsKo5jX-yuD5GHv5PPYCo/', [
-            'name' => trim($transaction->name),
+        Http::post('https://h.albato.ru/wh/38/1lfh5q5/rflqzh-V-N-QrTm_3SxR7ggDhqkXaZjXAZ9jFbsDMDQ/', [
+            'name' => $transaction->name,
             'lead_id' => $transaction->lead_id,
         ]);
     }

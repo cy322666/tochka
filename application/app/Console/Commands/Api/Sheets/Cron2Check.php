@@ -35,7 +35,7 @@ class Cron2Check extends Command
 
         foreach ($transactions as $transaction) {
 
-            Artisan::call('app:check1-count', [
+            Artisan::call('app:check2-count', [
                 'transaction' => $transaction
             ]);
         }

@@ -40,7 +40,7 @@ class Check1Count extends Command
         $transaction->name = $link->name;
         $transaction->save();
 
-        Http::post('https://h.albato.ru/wh/38/1lfh5q5/xTnl50b85iCsp9oFCfk9UL2N8iFZPTdZEEbAdNBGVeU/', [
+        Http::post('https://h.albato.ru/wh/38/1lfh5q5/-o0pDRENoOeYS_3PtpLGn0iFROqr3IVKnMqiOFabUAs/', [
             'name' => $transaction->name,
             'lead_id' => $transaction->lead_id,
         ]);
