@@ -13,8 +13,6 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('app:cron2-check')->dailyAt('17:00:00');
 
-        $schedule->command('app:get-page-link')->everyFiveMinutes();
-
         $schedule->command('ord:get-persons')->everyMinute();
         $schedule->command('ord:get-creative')->everyTenMinutes();
         $schedule->command('ord:get-contracts')->everyFiveMinutes();
