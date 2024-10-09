@@ -55,7 +55,7 @@ class SheetsController extends Controller
         }
 
         $transaction = Transaction::query()
-            ->createOrFirst(
+            ->firstOrCreate(
                 ['lead_id' => $request->lead_id],
                 ['url'  => $request->url]
             );
