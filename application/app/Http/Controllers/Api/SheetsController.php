@@ -41,7 +41,7 @@ class SheetsController extends Controller
     public function check2(Request $request)
     {
         $transaction = Transaction::query()
-            ->where(['lead_id', $request->lead_id])
+            ->where('lead_id', $request->lead_id)
             ->firstOr([], function () {
                 throw new \Exception('Не найдена транзакция для сделки');
             });
