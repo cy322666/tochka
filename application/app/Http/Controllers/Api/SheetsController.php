@@ -42,9 +42,9 @@ class SheetsController extends Controller
     {
         $transaction = Transaction::query()
             ->where('lead_id', $request->lead_id)
-            ->firstOr([], function () {
-                throw new \Exception('Не найдена транзакция для сделки');
-            });
+            ->first();
+
+        if (!$transaction) return;
 
         $transaction->count_2 = $request->count;
         $transaction->check_2 = $request->count !== null;
