@@ -56,13 +56,13 @@ class SendOrder implements ShouldQueue
 
             if ($this->order->lead_id) {
 
-                Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Уже есть синхронизация');
+//                Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Уже есть синхронизация');
 
                 $lead = $amoApi->service->leads()->find($this->order->lead_id);
                 //если не получили ее по апи, то склеена или удалена
                 if (!$lead) {
 
-                    Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Синхронизированная сделка не получена');
+//                    Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Синхронизированная сделка не получена');
 
                     $this->order->lead_id = null;
                     $this->order->save();
@@ -78,7 +78,7 @@ class SendOrder implements ShouldQueue
         //не рассрочка
         if (empty($lead) || !$lead) {
             //ишем активные сделки в рабочих воронках
-            Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Нет привязанной сделки, ищем активные в трех воронках');
+//            Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Нет привязанной сделки, ищем активные в трех воронках');
 
             $lead = Leads::searchActive($contact, $amoApi, [
                 Order::OP_PIPELINE_ID,
@@ -89,13 +89,13 @@ class SendOrder implements ShouldQueue
 
             if ($lead) {
                 //есть активная сделка, двигаем ее в ур или инициализацию
-                Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Есть активная сделка, обновляем ее');
+//                Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Есть активная сделка, обновляем ее');
 
                 $lead->status_id = $this->order->matchStatusByStateActive($lead);
                 $lead->save();
             } else {
                 //ищем успешные в рабочих воронках
-                Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Ищем успешные в трех рабочих воронках');
+//                Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Ищем успешные в трех рабочих воронках');
 
                 $lead = Leads::searchInStatus($contact, $amoApi, [
                     Order::OP_PIPELINE_ID,
@@ -109,40 +109,40 @@ class SendOrder implements ShouldQueue
                     $lead->pipeline_id == Order::DOP_PIPELINE_ID ||
                     $lead->pipeline_id == Order::EXT_PIPELINE_ID)) {
                         //если нашли, то это повторник -> сервис
-                        Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Есть сделка в продажных воронках -> повторник');
+//                        Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Есть сделка в продажных воронках -> повторник');
 
                         $lead = Leads::searchInPipeline($contact, $amoApi, Order::SERVICE_PIPELINE_ID);
                         //ищем успешную для обновления или создаем там новую
                         if ($lead) {
-                            Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Есть сделка в Сервисе - обновляем ее');
+//                            Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Есть сделка в Сервисе - обновляем ее');
 
                             $lead = $this->order->updateLead($lead, $this->order->matchStatusBySuccess());
                         } else {
-                            Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Нет сделки в Севрисе - создаем в нем');
+//                            Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Нет сделки в Севрисе - создаем в нем');
 
                             $lead = $this->order->createLead($contact, $this->order->matchStatusBySuccess(), Order::SERVICE_PIPELINE_ID);
                         }
                 //нет успешной в продажных, смотрим в сервисе
                 } elseif ($lead && $lead->pipeline_id == Order::SERVICE_PIPELINE_ID) {
                     //есть успешная в сервисе
-                    Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Есть сделка в Сервисе - обновляем ее');
+//                    Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Есть сделка в Сервисе - обновляем ее');
 
                     $lead = $this->order->updateLead($lead, $this->order->matchStatusBySuccess());
                 } else {
-                    Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Нет сделки в Севрисе - создаем в нем');
+//                    Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Нет сделки в Севрисе - создаем в нем');
 
                     $lead = $this->order->createLead($contact, $this->order->matchStatusNoSuccess(), Order::OP_PIPELINE_ID);
                 }
             }
         } elseif($lead->status_id != 142) {
 
-            Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Привязанная сделка не в успешном этапе -> обновляем ее');
+//            Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Привязанная сделка не в успешном этапе -> обновляем ее');
 
             $lead = $this->order->updateLead($lead, $this->order->matchStatusByStateActive($lead));
             $lead->save();
         }
 
-        Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Конец логики, обновляем бд');
+//        Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Конец логики, обновляем бд');
 
         Notes::addOne($lead, NoteHelper::createNoteOrder($this->order));
 
