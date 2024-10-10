@@ -57,6 +57,7 @@ class CreateContract extends Command
         $searchBaseContract = Contract::query()
             ->where('contractor_external_id', $transaction->person_uuid)
             ->where('type', 'service')
+            ->where('serial', explode('_', $lead->cf('Номер заявки')->getValue())[0])
             ->first();
 
         if (!$searchBaseContract) {
