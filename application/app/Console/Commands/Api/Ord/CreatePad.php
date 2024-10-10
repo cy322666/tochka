@@ -109,8 +109,12 @@ class CreatePad extends Command
 
                 Notes::addOne($lead,'Успешное создание площадки : '.$pad->uuid);
 
-                $lead->cf('ОРД Площадка')->setValue($result ? json_encode($result, JSON_UNESCAPED_UNICODE) : null);
-                $lead->save();
+                try {
+
+                    $lead->cf('ОРД Площадка')->setValue($result ? json_encode($result, JSON_UNESCAPED_UNICODE) : null);
+                    $lead->save();
+
+                } catch (\Throwable $e) {}
 
                 return true;
 

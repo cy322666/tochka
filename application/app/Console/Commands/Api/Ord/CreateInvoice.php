@@ -66,16 +66,22 @@ class CreateInvoice extends Command
                 ->where('inn', $lead->company->cf('ИНН')->getValue())
                 ->first();
 
+            Log::debug(__METHOD__.' : search person', $searchPerson ?: $searchPerson->toArray());
+
             $contract = Contract::query()
                 ->where('serial', $lead->cf('Номер заявки')->getValue())
                 ->where('type', '!=', 'service')
                 ->latest('created_at')
                 ->first();
 
+            Log::debug(__METHOD__.' : search contract', $contract ?: $contract->toArray());
+
             $searchPad = Pad::query()
                 ->where('person_external_id', $searchPerson->uuid)
                 ->where('name', $name)
                 ->first();
+
+            Log::debug(__METHOD__.' : search pad', $searchPad ?: $searchPad->toArray());
 
             $transaction->person_uuid = $searchPerson?->uuid;
             $transaction->contract_uuid = $contract?->uuid;
@@ -87,18 +93,27 @@ class CreateInvoice extends Command
 
                 $result3 = Artisan::call('ord:create-pad', ['transaction' => $transaction->id]);
 
-                if (!$result3)
-                    return false;
-            }
+                if (!$result3) {
 
-            $searchPad = Pad::query()
-                ->where('person_external_id', $searchPerson->uuid)
-                ->where('name', $name)
-                ->first();
+                    Notes::addOne($lead, 'Ошибка: ответ от команды создания площадки отрицательный');
+
+                    return false;
+                } else {
+
+                    Artisan::call('ord:get-pads');
+
+                    $searchPad = Pad::query()
+                        ->where('person_external_id', $searchPerson->uuid)
+                        ->where('name', $name)
+                        ->first();
+                }
+            }
 
             $creative = Creative::query()
                 ->where('contract_external_id', $contract->uuid)
                 ->first();
+
+            Log::debug(__METHOD__.' : search creative', $creative ?: $creative->toArray());
 
             if (!$creative) {
 
