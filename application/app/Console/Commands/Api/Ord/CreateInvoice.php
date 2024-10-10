@@ -187,7 +187,7 @@ class CreateInvoice extends Command
             $padUuid = $transaction->pad_uuid;
         }
 
-        $pad = $ordApi->pad()->get($padUuid);
+        $pad = $ordApi->pad()->get($transaction->pad_uuid);
 
         if (!$pad) {
 
