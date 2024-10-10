@@ -59,7 +59,8 @@ class Invoice
                             "date_end_planned"   => $this->date_end_planned,
                             "date_start_actual"  => $this->date_start_actual,
                             "date_end_actual" => $this->date_end_actual,
-                            "pay_type" => "cpm"
+                            "pay_type" => "cpm",
+                            "flags" => ["vat_included"],
                         ]]
                         ]
                     ]
