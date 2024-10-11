@@ -193,16 +193,24 @@ class CreateInvoice extends Command
 
             Notes::addOne($lead, 'Ошибка: по uuid не нашли площадку в ОРД : '.$padUuid);
 
-            $result = Artisan::call('ord:create-pad', ['transaction' => $transaction->refresh()->id]);
+            $result = Artisan::call('ord:create-pad', ['transaction' => $transaction->id]);
 
             if (!$result) {
 
                 return false;
             }
-            $padUuid = $transaction->pad_uuid;
-        }
 
-        $transaction->refresh();
+            $transaction->refresh();
+
+            $padUuid = $transaction->pad_uuid;
+
+            if (!$padUuid) {
+
+                Notes::addOne($lead, 'Ошибка: после команды создания площадки не получен uuid');
+
+                return;
+            }
+        }
 
         $invoice = $ordApi->invoice();
 
