@@ -156,14 +156,16 @@ class Order extends Model
             'sale' => $this->cost_money,
         ], $this->name);
 
+        $orderId = str_replace('8000', '', $this->order_id);
+
         try {
-            $lead->cf('GetCourse. Номер заказа')->setValue($this->order_id);
+            $lead->cf('GetCourse. Номер заказа')->setValue($orderId);
             $lead->cf('GetCourse. Оплачено')->setValue($this->payed_money);
             $lead->cf('GetCourse. Состав заказа')->setValue($this->positions);
             $lead->cf('GetCourse. Осталось оплатить')->setValue($this->left_cost_money);
             $lead->cf('GetCourse. Статус заказа')->setValue($this->status_order);
 
-            $lead->cf('GetCourse. Ссылка на заказ')->setValue('https://admin.tochka-school.ru/#/order/'.str_replace('8000', '', $this->order_id));
+            $lead->cf('GetCourse. Ссылка на заказ')->setValue('https://admin.tochka-school.ru/#/order/'.$orderId);
 
         } catch (\Throwable $e) {
             Log::alert(__METHOD__.' '.$this->id, [$e->getMessage()]);
@@ -182,14 +184,16 @@ class Order extends Model
     {
         Log::info(__METHOD__.' '.$this->id.' Обновление сделки');
 
+        $orderId = str_replace('8000', '', $this->order_id);
+
         try {
-            $lead->cf('GetCourse. Номер заказа')->setValue($this->order_id);
+            $lead->cf('GetCourse. Номер заказа')->setValue($orderId);
             $lead->cf('GetCourse. Оплачено')->setValue($this->payed_money);
             $lead->cf('GetCourse. Состав заказа')->setValue($this->positions);
             $lead->cf('GetCourse. Осталось оплатить')->setValue($this->left_cost_money);
             $lead->cf('GetCourse. Статус заказа')->setValue($this->status_order);
 
-            $lead->cf('GetCourse. Ссылка на заказ')->setValue('https://admin.tochka-school.ru/#/order/'.str_replace('8000', '', $this->order_id));
+            $lead->cf('GetCourse. Ссылка на заказ')->setValue('https://admin.tochka-school.ru/#/order/'.$orderId);
 
         } catch (\Throwable $e) {
             Log::alert(__METHOD__, [$e->getMessage()]);
