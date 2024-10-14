@@ -162,11 +162,6 @@ class CreateInvoice extends Command
 
                 if (!$transaction->erid) {
 
-                    Notes::addOne($lead, 'Ошибка: Не указан uuid креатива');
-
-                    return false;
-                } else {
-
                     $creative = Creative::query()
                         ->where('erid', $transaction->erid)
                         ->first();
@@ -174,7 +169,7 @@ class CreateInvoice extends Command
                     if (!$creative) {
 
                         $creative = Creative::query()
-                            ->where('contract_external_id', $contractUuid)
+                            ->where('contract_external_id', $transaction->contract_uuid)
                             ->first();
 
                         if (!$creative) {
