@@ -38,18 +38,21 @@ class SiteController extends Controller
 
         $lead = Leads::create($contact, [
             'responsible_user_id' => 5998951,
-            'status_id' => 55761370,
         ], 'Новая заявка с сайта на консультацию');
 
         $lead->cf('Источник обращения')->setValue('Заявка с сайта на консультацию');
 
-        if ($request->action == 'selection')
+        if ($request->action == 'selection') {
 
             $lead->attachTag('Сайт консультация');
+            $lead->status_id = 44126251;
+        }
 
-        if ($request->action == 'externship')
+        if ($request->action == 'externship') {
 
             $lead->attachTag('Сайт экстернат');
+            $lead->status_id = 55761370;
+        }
 
         $lead->save();
 
