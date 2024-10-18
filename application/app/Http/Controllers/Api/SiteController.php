@@ -43,7 +43,14 @@ class SiteController extends Controller
 
         $lead->cf('Источник обращения')->setValue('Заявка с сайта на консультацию');
 
-        $lead->attachTag('Сайт экстернат');
+        if ($request->action == 'selection')
+
+            $lead->attachTag('Сайт консультация');
+
+        if ($request->action == 'externship')
+
+            $lead->attachTag('Сайт экстернат');
+
         $lead->save();
 
         Log::info(__METHOD__.' lead_id : '.$lead->id);
