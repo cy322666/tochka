@@ -144,9 +144,11 @@ class SendOrder implements ShouldQueue
 
 //        Log::info(__METHOD__.' '.__LINE__.' '.$this->order->id.' Конец логики, обновляем бд');
 
-        Notes::addOne($lead, NoteHelper::createNoteOrder($this->order));
+        sleep(5);
 
         $lead = $amoApi->service->leads()->find($lead->id);
+
+        Notes::addOne($lead, NoteHelper::createNoteOrder($this->order));
 
         //тут частичная оплата или нет
         if (($this->order->status_order == 'Частично оплачен' &&
